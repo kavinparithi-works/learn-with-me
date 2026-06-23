@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Production Data Engineering - LearnWithMe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+.pipeline-flow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+  padding: 20px;
+  background: linear-gradient(135deg, #f0f4ff 0%, #faf0ff 100%);
+  border-radius: 14px;
+}
+.pipe-step {
+  background: white;
+  border: 2px solid var(--blue);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue);
+  text-align: center;
+  animation: popIn 0.4s ease forwards;
+  opacity: 0;
+  white-space: nowrap;
+}
+.pipe-step.source { border-color: var(--purple); color: var(--purple); }
+.pipe-step.transform { border-color: var(--teal); color: var(--teal); }
+.pipe-step.sink { border-color: var(--green); color: var(--green); }
+.pipe-step.monitor { border-color: var(--orange); color: var(--orange); }
+.pipe-arrow { font-size: 20px; color: var(--muted); flex-shrink: 0; }
+
+/* Medallion layers */
+.medallion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+}
+.medal-layer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 24px;
+  border-radius: 12px;
+  animation: slideIn 0.5s ease forwards;
+  opacity: 0;
+}
+.medal-layer.bronze { background: linear-gradient(135deg, #fef3c7, #fde68a); border-left: 6px solid #f59e0b; }
+.medal-layer.silver { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); border-left: 6px solid #64748b; }
+.medal-layer.gold { background: linear-gradient(135deg, #fef3c7, #fde68a); border-left: 6px solid #d97706; }
+.medal-icon { font-size: 28px; flex-shrink: 0; }
+.medal-title { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+.medal-desc { font-size: 13px; color: var(--muted); }
+
+/* CI/CD pipeline */
+.cicd-flow {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin: 20px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #e5e7eb;
+}
+.cicd-stage {
+  flex: 1;
+  padding: 14px 12px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  border-right: 2px solid #e5e7eb;
+  animation: fadeIn 0.5s ease forwards;
+  opacity: 0;
+}
+.cicd-stage:last-child { border-right: none; }
+.cicd-stage.dev { background: #eff6ff; color: var(--blue); }
+.cicd-stage.ci { background: #f0fdf4; color: var(--green); }
+.cicd-stage.staging { background: #fff7ed; color: var(--orange); }
+.cicd-stage.prod { background: #faf0ff; color: var(--purple); }
+.cicd-status { font-size: 18px; display: block; margin-bottom: 4px; }
+
+/* Project cards */
+.project-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 24px;
+  margin: 16px 0;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.project-card:hover { border-color: var(--blue); box-shadow: 0 4px 20px rgba(79,142,247,0.12); }
+.project-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+.project-number {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  color: white;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 16px;
+  flex-shrink: 0;
+}
+.project-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+.project-subtitle { font-size: 13px; color: var(--muted); }
+.project-tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
+.project-tag {
+  font-size: 11px; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px;
+  background: #eff6ff; color: var(--blue);
+}
+.project-tag.green { background: #f0fdf4; color: var(--green); }
+.project-tag.purple { background: #faf0ff; color: var(--purple); }
+.project-tag.orange { background: #fff7ed; color: var(--orange); }
+
+/* Monitoring dashboard */
+.monitor-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 16px 0;
+}
+.monitor-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+  animation: popIn 0.4s ease forwards;
+  opacity: 0;
+}
+.monitor-value { font-size: 24px; font-weight: 700; color: var(--blue); }
+.monitor-label { font-size: 11px; color: var(--muted); margin-top: 4px; font-weight: 600; }
+.monitor-status { font-size: 10px; margin-top: 6px; }
+.monitor-status.ok { color: var(--green); }
+.monitor-status.warn { color: var(--orange); }
+
+/* Alert flow */
+.alert-flow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 18px;
+  background: #fef2f2;
+  border-left: 4px solid #ef4444;
+  border-radius: 0 8px 8px 0;
+  margin: 8px 0;
+  font-size: 13px;
+  animation: slideIn 0.4s ease forwards;
+  opacity: 0;
+}
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<header class="topbar">
+  <a href="index.html" class="logo">
+    <div class="logo-icon">L</div>
+    <span>LearnWithMe</span>
+  </a>
+  <nav class="topbar-nav">
+    <a href="sql.html">SQL</a>
+    <a href="python.html">Python</a>
+    <a href="spark.html">Spark</a>
+    <a href="delta.html">Delta Lake</a>
+    <a href="azure.html">Azure</a>
+    <a href="production.html" class="active">Production</a>
+    <a href="interview.html">Interview</a>
+  </nav>
+  <div class="topbar-right">
+    <span id="streak-badge" class="streak-badge" style="display:none"></span>
+    <button class="btn-outline" id="signin-btn" onclick="openAuth()">Sign In</button>
+    <div class="user-pill" id="user-pill">
+      <div class="user-avatar">U</div>
+      <span class="user-name"></span>
+      <button onclick="signOut()" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--muted)">Sign out</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-section-label">Level 9 - Production DE</div>
+    <div class="sidebar-item" data-topic="prod-etl" data-target="prod-etl" onclick="scrollToSection('prod-etl')">
+      <span class="sidebar-check"></span>ETL Pipeline Patterns
+    </div>
+    <div class="sidebar-item" data-topic="medallion" data-target="medallion" onclick="scrollToSection('medallion')">
+      <span class="sidebar-check"></span>Medallion Architecture
+    </div>
+    <div class="sidebar-item" data-topic="data-quality" data-target="data-quality" onclick="scrollToSection('data-quality')">
+      <span class="sidebar-check"></span>Data Quality
+    </div>
+    <div class="sidebar-item" data-topic="cicd" data-target="cicd" onclick="scrollToSection('cicd')">
+      <span class="sidebar-check"></span>CI/CD for Data Pipelines
+    </div>
+    <div class="sidebar-item" data-topic="monitoring" data-target="monitoring" onclick="scrollToSection('monitoring')">
+      <span class="sidebar-check"></span>Monitoring and Alerting
+    </div>
+    <div class="sidebar-item" data-topic="quiz-prod" data-target="quiz-prod" onclick="scrollToSection('quiz-prod')">
+      <span class="sidebar-check"></span>Production Quiz
+    </div>
+
+    <div class="sidebar-section-label" style="margin-top:16px">Enterprise Projects</div>
+    <div class="sidebar-item" data-target="project1" onclick="scrollToSection('project1')">
+      <span class="sidebar-check"></span>1. E-Commerce ETL
+    </div>
+    <div class="sidebar-item" data-target="project2" onclick="scrollToSection('project2')">
+      <span class="sidebar-check"></span>2. Real-Time Analytics
+    </div>
+    <div class="sidebar-item" data-target="project3" onclick="scrollToSection('project3')">
+      <span class="sidebar-check"></span>3. Data Lakehouse
+    </div>
+    <div class="sidebar-item" data-target="project4" onclick="scrollToSection('project4')">
+      <span class="sidebar-check"></span>4. Financial Reporting
+    </div>
+    <div class="sidebar-item" data-target="project5" onclick="scrollToSection('project5')">
+      <span class="sidebar-check"></span>5. ML Feature Store
+    </div>
+    <div class="sidebar-item" data-target="project6" onclick="scrollToSection('project6')">
+      <span class="sidebar-check"></span>6. Multi-Cloud Migration
+    </div>
+    <div class="sidebar-item" data-target="project7" onclick="scrollToSection('project7')">
+      <span class="sidebar-check"></span>7. Event Streaming
+    </div>
+    <div class="sidebar-item" data-target="project8" onclick="scrollToSection('project8')">
+      <span class="sidebar-check"></span>8. Data Mesh
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="level-banner" data-section="prod-etl" id="prod-etl" style="background:linear-gradient(135deg,#faf0ff,#f0f4ff);">
+      <div class="level-badge" style="background:var(--purple)">Level 9</div>
+      <h1>Production Data Engineering</h1>
+      <p>Build enterprise-grade pipelines - ETL patterns, Medallion architecture, data quality, CI/CD, monitoring, and 8 real-world projects.</p>
+    </div>
+
+    <!-- ETL PIPELINE PATTERNS -->
+    <section class="lesson-section" data-section="prod-etl">
+      <h2 class="section-title">ETL Pipeline Patterns</h2>
+      <p class="section-intro">Production ETL pipelines follow consistent patterns: ingest raw data, validate and clean it, transform for business use, and load to target systems - with error handling and idempotency at every step.</p>
+
+      <!-- Pipeline flow animation -->
+      <div class="anim-stage" style="min-height:140px;">
+        <div class="anim-label">Production ETL Flow</div>
+        <div class="pipeline-flow">
+          <div class="pipe-step source" style="animation-delay:0.1s">Source<br><span style="font-size:10px;font-weight:400">API / DB / Files</span></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step" style="animation-delay:0.2s">Ingest<br><span style="font-size:10px;font-weight:400">Raw Landing</span></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step transform" style="animation-delay:0.3s">Validate<br><span style="font-size:10px;font-weight:400">Schema + Quality</span></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step transform" style="animation-delay:0.4s">Transform<br><span style="font-size:10px;font-weight:400">Business Logic</span></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step sink" style="animation-delay:0.5s">Load<br><span style="font-size:10px;font-weight:400">Delta / DW</span></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step monitor" style="animation-delay:0.6s">Monitor<br><span style="font-size:10px;font-weight:400">Alerts + Logs</span></div>
+        </div>
+      </div>
+
+      <div class="content-block">
+        <h3>Key Principles of Production Pipelines</h3>
+        <ul class="content-list">
+          <li><strong>Idempotency:</strong> Running a pipeline twice produces the same result as running it once. Use MERGE instead of INSERT, write to partitioned paths, track watermarks.</li>
+          <li><strong>Incremental Loading:</strong> Process only new or changed data since the last run. Track via watermark column (updated_at), partition date, or Change Data Capture (CDC).</li>
+          <li><strong>Error Isolation:</strong> Quarantine bad records to a dead-letter table instead of failing the whole pipeline. Process the 99% that's clean; fix and replay the 1%.</li>
+          <li><strong>Lineage:</strong> Track where every piece of data came from, how it was transformed, and where it went. Required for debugging and compliance.</li>
+          <li><strong>Observability:</strong> Log row counts, durations, anomalies, and SLA breaches. Alert before business users notice problems.</li>
+        </ul>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Incremental Load Pattern with Watermark</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> F
+<span class="kw">from</span> delta.tables <span class="kw">import</span> DeltaTable
+
+<span class="kw">def</span> run_incremental_load(spark, source_path, target_path, watermark_col=<span class="s">"updated_at"</span>):
+    <span class="c"># 1. Read current watermark from target</span>
+    target = DeltaTable.forPath(spark, target_path)
+    last_ts = target.toDF() \
+        .agg(F.max(watermark_col).alias(<span class="s">"max_ts"</span>)) \
+        .collect()[0][<span class="s">"max_ts"</span>]
+
+    <span class="c"># 2. Read only new/changed records from source</span>
+    source_df = spark.read.parquet(source_path) \
+        .filter(F.col(watermark_col) > last_ts)
+
+    if source_df.count() == 0:
+        print(<span class="s">"No new records - skipping"</span>)
+        <span class="kw">return</span>
+
+    <span class="c"># 3. Validate</span>
+    validated_df = validate(source_df)
+
+    <span class="c"># 4. MERGE (upsert) into target</span>
+    target.alias(<span class="s">"t"</span>).merge(
+        validated_df.alias(<span class="s">"s"</span>),
+        <span class="s">"t.id = s.id"</span>
+    ) \
+    .whenMatchedUpdateAll() \
+    .whenNotMatchedInsertAll() \
+    .execute()
+
+    print(f<span class="s">"Loaded {validated_df.count()} records"</span>)
+
+<span class="kw">def</span> validate(df):
+    <span class="c"># Quarantine nulls in required fields</span>
+    good = df.filter(F.col(<span class="s">"id"</span>).isNotNull() &amp; F.col(<span class="s">"amount"</span>).isNotNull())
+    bad = df.filter(F.col(<span class="s">"id"</span>).isNull() | F.col(<span class="s">"amount"</span>).isNull())
+    <span class="kw">if</span> bad.count() > 0:
+        bad.withColumn(<span class="s">"quarantine_reason"</span>, F.lit(<span class="s">"null_required_field"</span>)) \
+           .write.mode(<span class="s">"append"</span>).save(<span class="s">"/quarantine/bad_records"</span>)
+    <span class="kw">return</span> good</pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Full Load with Overwrite Partition Strategy</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="c"># For daily full loads partitioned by date</span>
+<span class="c"># Replace only the partition being processed (idempotent)</span>
+
+spark.conf.set(<span class="s">"spark.sql.sources.partitionOverwriteMode"</span>, <span class="s">"dynamic"</span>)
+
+df.withColumn(<span class="s">"load_date"</span>, F.lit(<span class="s">"2024-01-15"</span>)) \
+  .write \
+  .mode(<span class="s">"overwrite"</span>) \
+  .partitionBy(<span class="s">"load_date"</span>) \
+  .format(<span class="s">"delta"</span>) \
+  .save(<span class="s">"/delta/sales"</span>)
+
+<span class="c"># With dynamic partition overwrite, only the 2024-01-15 partition</span>
+<span class="c"># is replaced. All other partitions are untouched.</span>
+<span class="c"># Re-running the same date is safe (idempotent).</span></pre>
+      </div>
+    </section>
+
+    <!-- MEDALLION ARCHITECTURE -->
+    <section class="lesson-section" data-section="medallion" id="medallion">
+      <h2 class="section-title">Medallion Architecture</h2>
+      <p class="section-intro">The Medallion Architecture organizes data into Bronze, Silver, and Gold layers - each progressively more refined, trusted, and business-ready. It's the standard pattern for modern lakehouses.</p>
+
+      <!-- Medallion visual -->
+      <div class="anim-stage" style="min-height:280px;">
+        <div class="anim-label">Bronze - Silver - Gold Data Quality Flow</div>
+        <div class="medallion" style="margin-top:16px;">
+          <div class="medal-layer bronze" style="animation-delay:0.1s">
+            <div class="medal-icon">🥉</div>
+            <div>
+              <div class="medal-title">Bronze - Raw Ingestion</div>
+              <div class="medal-desc">Exact copy of source data, never modified. JSON/CSV/Parquet as-is. Append-only. The "source of truth" for replay. May have duplicates, nulls, bad data types.</div>
+            </div>
+          </div>
+          <div style="text-align:center;font-size:20px;color:var(--muted)">↓ validate, deduplicate, cast types</div>
+          <div class="medal-layer silver" style="animation-delay:0.3s">
+            <div class="medal-icon">🥈</div>
+            <div>
+              <div class="medal-title">Silver - Cleansed and Conformed</div>
+              <div class="medal-desc">Deduplicated, schema-validated, proper data types. Nulls handled. Business rules applied. Ready for analysts. Can be used for operational dashboards.</div>
+            </div>
+          </div>
+          <div style="text-align:center;font-size:20px;color:var(--muted)">↓ aggregate, join, enrich</div>
+          <div class="medal-layer gold" style="animation-delay:0.5s">
+            <div class="medal-icon">🥇</div>
+            <div>
+              <div class="medal-title">Gold - Business Aggregates</div>
+              <div class="medal-desc">Pre-aggregated, denormalized for performance. Daily KPIs, customer 360 views, revenue summaries. Directly powering BI dashboards and reports. Highly refined.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Medallion Pipeline in PySpark + Delta Lake</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="c">## BRONZE: Raw ingest (append only)</span>
+raw_df = spark.read \
+    .option(<span class="s">"header"</span>, <span class="s">"true"</span>) \
+    .csv(<span class="s">"/landing/orders_20240115.csv"</span>)
+
+raw_df \
+    .withColumn(<span class="s">"_ingested_at"</span>, F.current_timestamp()) \
+    .withColumn(<span class="s">"_source_file"</span>, F.lit(<span class="s">"orders_20240115.csv"</span>)) \
+    .write.mode(<span class="s">"append"</span>) \
+    .format(<span class="s">"delta"</span>) \
+    .save(<span class="s">"/bronze/orders"</span>)
+
+
+<span class="c">## SILVER: Cleanse and deduplicate</span>
+bronze_df = spark.read.format(<span class="s">"delta"</span>).load(<span class="s">"/bronze/orders"</span>)
+
+silver_df = bronze_df \
+    .filter(F.col(<span class="s">"order_id"</span>).isNotNull()) \
+    .withColumn(<span class="s">"amount"</span>, F.col(<span class="s">"amount"</span>).cast(<span class="s">"double"</span>)) \
+    .withColumn(<span class="s">"order_date"</span>, F.to_date(F.col(<span class="s">"order_date"</span>), <span class="s">"yyyy-MM-dd"</span>)) \
+    .withColumn(<span class="s">"rn"</span>, F.row_number().over(
+        Window.partitionBy(<span class="s">"order_id"</span>).orderBy(F.col(<span class="s">"_ingested_at"</span>).desc())
+    )) \
+    .filter(F.col(<span class="s">"rn"</span>) == 1) \
+    .drop(<span class="s">"rn"</span>, <span class="s">"_source_file"</span>)
+
+DeltaTable.forPath(spark, <span class="s">"/silver/orders"</span>).alias(<span class="s">"t"</span>) \
+    .merge(silver_df.alias(<span class="s">"s"</span>), <span class="s">"t.order_id = s.order_id"</span>) \
+    .whenMatchedUpdateAll() \
+    .whenNotMatchedInsertAll() \
+    .execute()
+
+
+<span class="c">## GOLD: Aggregate for business</span>
+silver_df = spark.read.format(<span class="s">"delta"</span>).load(<span class="s">"/silver/orders"</span>)
+
+daily_revenue = silver_df \
+    .groupBy(<span class="s">"order_date"</span>, <span class="s">"region"</span>) \
+    .agg(
+        F.sum(<span class="s">"amount"</span>).alias(<span class="s">"daily_revenue"</span>),
+        F.count(<span class="s">"*"</span>).alias(<span class="s">"order_count"</span>),
+        F.avg(<span class="s">"amount"</span>).alias(<span class="s">"avg_order_value"</span>),
+        F.countDistinct(<span class="s">"customer_id"</span>).alias(<span class="s">"unique_customers"</span>)
+    )
+
+daily_revenue \
+    .write.mode(<span class="s">"overwrite"</span>) \
+    .partitionBy(<span class="s">"order_date"</span>) \
+    .format(<span class="s">"delta"</span>) \
+    .save(<span class="s">"/gold/daily_revenue"</span>)</pre>
+      </div>
+    </section>
+
+    <!-- DATA QUALITY -->
+    <section class="lesson-section" data-section="data-quality" id="data-quality">
+      <h2 class="section-title">Data Quality Checks</h2>
+      <p class="section-intro">Data quality is the difference between a pipeline that runs and a pipeline that's <em>trusted</em>. Implement expectations at every layer.</p>
+
+      <div class="code-block">
+        <div class="code-header"><span>Data Quality Framework</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass
+<span class="kw">from</span> typing <span class="kw">import</span> List, Dict
+<span class="kw">import</span> json
+
+@dataclass
+<span class="kw">class</span> QualityResult:
+    check_name: str
+    passed: bool
+    actual: float
+    threshold: float
+    message: str
+
+<span class="kw">def</span> run_quality_checks(df, checks: List[Dict]) -> List[QualityResult]:
+    results = []
+    total = df.count()
+
+    <span class="kw">for</span> check <span class="kw">in</span> checks:
+        <span class="kw">if</span> check[<span class="s">"type"</span>] == <span class="s">"not_null"</span>:
+            col = check[<span class="s">"column"</span>]
+            null_count = df.filter(F.col(col).isNull()).count()
+            null_pct = (null_count / total) * 100
+            passed = null_pct &lt;= check.get(<span class="s">"max_null_pct"</span>, 0)
+            results.append(QualityResult(
+                f<span class="s">"not_null_{col}"</span>, passed, null_pct,
+                check.get(<span class="s">"max_null_pct"</span>, 0),
+                f<span class="s">"{col}: {null_pct:.1f}% null"</span>
+            ))
+
+        <span class="kw">elif</span> check[<span class="s">"type"</span>] == <span class="s">"row_count"</span>:
+            passed = total >= check[<span class="s">"min_rows"</span>]
+            results.append(QualityResult(
+                <span class="s">"row_count"</span>, passed, total,
+                check[<span class="s">"min_rows"</span>],
+                f<span class="s">"Row count: {total}"</span>
+            ))
+
+        <span class="kw">elif</span> check[<span class="s">"type"</span>] == <span class="s">"unique"</span>:
+            col = check[<span class="s">"column"</span>]
+            dup_count = total - df.dropDuplicates([col]).count()
+            passed = dup_count == 0
+            results.append(QualityResult(
+                f<span class="s">"unique_{col}"</span>, passed, dup_count, 0,
+                f<span class="s">"{col}: {dup_count} duplicates"</span>
+            ))
+
+    failed = [r <span class="kw">for</span> r <span class="kw">in</span> results <span class="kw">if</span> not r.passed]
+    <span class="kw">if</span> failed:
+        <span class="kw">raise</span> ValueError(f<span class="s">"Quality checks failed: {[r.check_name for r in failed]}"</span>)
+    <span class="kw">return</span> results
+
+<span class="c"># Usage</span>
+checks = [
+    {<span class="s">"type"</span>: <span class="s">"row_count"</span>, <span class="s">"min_rows"</span>: 100},
+    {<span class="s">"type"</span>: <span class="s">"not_null"</span>, <span class="s">"column"</span>: <span class="s">"order_id"</span>, <span class="s">"max_null_pct"</span>: 0},
+    {<span class="s">"type"</span>: <span class="s">"not_null"</span>, <span class="s">"column"</span>: <span class="s">"amount"</span>, <span class="s">"max_null_pct"</span>: 1.0},
+    {<span class="s">"type"</span>: <span class="s">"unique"</span>, <span class="s">"column"</span>: <span class="s">"order_id"</span>}
+]
+results = run_quality_checks(df, checks)</pre>
+      </div>
+
+      <div class="info-box info-purple">
+        <strong>Delta Live Tables (DLT) Quality:</strong> In Databricks, use @expect and @expect_or_drop decorators on DLT tables - they enforce expectations declaratively and track violations in a quality dashboard automatically.
+      </div>
+    </section>
+
+    <!-- CI/CD -->
+    <section class="lesson-section" data-section="cicd" id="cicd">
+      <h2 class="section-title">CI/CD for Data Pipelines</h2>
+      <p class="section-intro">Modern data engineering uses software engineering practices - version control, automated testing, and staged deployments. Every pipeline change goes through code review and tests before reaching production.</p>
+
+      <!-- CI/CD flow -->
+      <div class="anim-stage" style="min-height:180px;">
+        <div class="anim-label">Branch to Production Pipeline</div>
+        <div class="cicd-flow" style="margin-top:16px;">
+          <div class="cicd-stage dev" style="animation-delay:0.1s">
+            <span class="cicd-status">💻</span>
+            Dev Branch<br>Write Code
+          </div>
+          <div class="cicd-stage ci" style="animation-delay:0.2s">
+            <span class="cicd-status">✅</span>
+            CI Checks<br>Tests + Lint
+          </div>
+          <div class="cicd-stage ci" style="animation-delay:0.3s">
+            <span class="cicd-status">🔍</span>
+            Code Review<br>PR Approval
+          </div>
+          <div class="cicd-stage staging" style="animation-delay:0.4s">
+            <span class="cicd-status">🧪</span>
+            Staging<br>Integration Test
+          </div>
+          <div class="cicd-stage prod" style="animation-delay:0.5s">
+            <span class="cicd-status">🚀</span>
+            Production<br>Deploy
+          </div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>GitHub Actions Workflow for Databricks</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="c"># .github/workflows/deploy.yml</span>
+name: Deploy Data Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: pip install pytest pyspark delta-spark
+      - name: Run unit tests
+        run: pytest tests/ -v --tb=short
+      - name: Run linting
+        run: flake8 src/ --max-line-length=100
+
+  deploy-staging:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy to Databricks Staging
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST_STAGING }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN_STAGING }}
+        run: |
+          pip install databricks-cli
+          databricks workspace import_dir src/ /Repos/staging/pipeline --overwrite
+          databricks jobs run-now --job-id ${{ vars.STAGING_JOB_ID }}
+
+  deploy-prod:
+    needs: deploy-staging
+    environment: production  <span class="c"># requires manual approval</span>
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Production
+        run: databricks jobs update --job-id ${{ vars.PROD_JOB_ID }}</pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Unit Testing PySpark Pipelines</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="c"># tests/test_transforms.py</span>
+<span class="kw">import</span> pytest
+<span class="kw">from</span> pyspark.sql <span class="kw">import</span> SparkSession
+<span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> F
+<span class="kw">from</span> src.transforms <span class="kw">import</span> calculate_daily_revenue, clean_orders
+
+@pytest.fixture(scope=<span class="s">"session"</span>)
+<span class="kw">def</span> spark():
+    <span class="kw">return</span> SparkSession.builder \
+        .master(<span class="s">"local[2]"</span>) \
+        .appName(<span class="s">"unit-tests"</span>) \
+        .getOrCreate()
+
+<span class="kw">class</span> TestCleanOrders:
+    <span class="kw">def</span> test_removes_null_order_ids(self, spark):
+        data = [(1, <span class="s">"A"</span>, 100.0), (None, <span class="s">"B"</span>, 200.0), (3, <span class="s">"C"</span>, 300.0)]
+        df = spark.createDataFrame(data, [<span class="s">"order_id"</span>, <span class="s">"customer"</span>, <span class="s">"amount"</span>])
+        result = clean_orders(df)
+        assert result.count() == 2
+        assert result.filter(F.col(<span class="s">"order_id"</span>).isNull()).count() == 0
+
+    <span class="kw">def</span> test_deduplicates_order_ids(self, spark):
+        data = [(1, <span class="s">"A"</span>, 100.0), (1, <span class="s">"A"</span>, 100.0), (2, <span class="s">"B"</span>, 200.0)]
+        df = spark.createDataFrame(data, [<span class="s">"order_id"</span>, <span class="s">"customer"</span>, <span class="s">"amount"</span>])
+        result = clean_orders(df)
+        assert result.count() == 2
+
+<span class="kw">class</span> TestDailyRevenue:
+    <span class="kw">def</span> test_aggregates_by_date(self, spark):
+        data = [
+            (<span class="s">"2024-01-01"</span>, <span class="s">"US"</span>, 100.0),
+            (<span class="s">"2024-01-01"</span>, <span class="s">"US"</span>, 200.0),
+            (<span class="s">"2024-01-02"</span>, <span class="s">"US"</span>, 150.0),
+        ]
+        df = spark.createDataFrame(data, [<span class="s">"date"</span>, <span class="s">"region"</span>, <span class="s">"amount"</span>])
+        result = calculate_daily_revenue(df)
+        jan1 = result.filter(F.col(<span class="s">"date"</span>) == <span class="s">"2024-01-01"</span>).collect()[0]
+        assert jan1[<span class="s">"daily_revenue"</span>] == 300.0
+        assert jan1[<span class="s">"order_count"</span>] == 2</pre>
+      </div>
+    </section>
+
+    <!-- MONITORING -->
+    <section class="lesson-section" data-section="monitoring" id="monitoring">
+      <h2 class="section-title">Monitoring and Alerting</h2>
+      <p class="section-intro">A pipeline that runs without monitoring is a ticking time bomb. Know when data is late, volumes drop unexpectedly, or quality degrades - before stakeholders notice.</p>
+
+      <!-- Monitor dashboard -->
+      <div class="anim-stage" style="min-height:200px;">
+        <div class="anim-label">Pipeline Health Dashboard</div>
+        <div class="monitor-grid" style="margin-top:16px;">
+          <div class="monitor-card" style="animation-delay:0.1s">
+            <div class="monitor-value">99.8%</div>
+            <div class="monitor-label">Pipeline Success Rate</div>
+            <div class="monitor-status ok">HEALTHY</div>
+          </div>
+          <div class="monitor-card" style="animation-delay:0.2s">
+            <div class="monitor-value">4.2M</div>
+            <div class="monitor-label">Rows Processed Today</div>
+            <div class="monitor-status ok">+12% vs yesterday</div>
+          </div>
+          <div class="monitor-card" style="animation-delay:0.3s">
+            <div class="monitor-value">23m</div>
+            <div class="monitor-label">Avg Pipeline Duration</div>
+            <div class="monitor-status warn">WARNING: +8m vs baseline</div>
+          </div>
+          <div class="monitor-card" style="animation-delay:0.4s">
+            <div class="monitor-value">0.02%</div>
+            <div class="monitor-label">Data Quality Failures</div>
+            <div class="monitor-status ok">BELOW THRESHOLD</div>
+          </div>
+          <div class="monitor-card" style="animation-delay:0.5s">
+            <div class="monitor-value">8:03</div>
+            <div class="monitor-label">Last Successful Run</div>
+            <div class="monitor-status ok">SLA: 8:30 AM</div>
+          </div>
+          <div class="monitor-card" style="animation-delay:0.6s">
+            <div class="monitor-value">$0.84</div>
+            <div class="monitor-label">DBU Cost Today</div>
+            <div class="monitor-status ok">WITHIN BUDGET</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alert examples -->
+      <div style="margin:20px 0;">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:12px">Alert Scenarios</h3>
+        <div class="alert-flow" style="animation-delay:0.1s">
+          <span>🔴</span>
+          <div><strong>Volume Anomaly:</strong> Orders table received 200 rows - expected 10,000+ based on 30-day average. Possible upstream API failure.</div>
+        </div>
+        <div class="alert-flow" style="animation-delay:0.2s;border-color:var(--orange);background:#fff7ed;">
+          <span>🟡</span>
+          <div><strong>SLA Warning:</strong> Daily ETL pipeline at 8:25 AM - 5 minutes until SLA breach. Currently processing Silver layer.</div>
+        </div>
+        <div class="alert-flow" style="animation-delay:0.3s;border-color:var(--orange);background:#fff7ed;">
+          <span>🟡</span>
+          <div><strong>Schema Change Detected:</strong> Source table orders added column "promo_code" (nullable varchar). Bronze layer updated automatically.</div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Pipeline Monitoring with Structured Logging</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="kw">import</span> logging
+<span class="kw">import</span> json
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+<span class="kw">class</span> PipelineMonitor:
+    <span class="kw">def</span> __init__(self, pipeline_name: str):
+        self.pipeline_name = pipeline_name
+        self.metrics = {}
+        self.start_time = datetime.utcnow()
+        self.logger = logging.getLogger(pipeline_name)
+
+    <span class="kw">def</span> log_metric(self, name: str, value, unit: str = <span class="s">""</span>):
+        self.metrics[name] = {<span class="s">"value"</span>: value, <span class="s">"unit"</span>: unit, <span class="s">"ts"</span>: datetime.utcnow().isoformat()}
+        self.logger.info(json.dumps({<span class="s">"metric"</span>: name, <span class="s">"value"</span>: value, <span class="s">"unit"</span>: unit}))
+
+    <span class="kw">def</span> check_volume(self, df, expected_min: int, expected_max: int = None):
+        count = df.count()
+        self.log_metric(<span class="s">"row_count"</span>, count, <span class="s">"rows"</span>)
+        <span class="kw">if</span> count &lt; expected_min:
+            self.alert(f<span class="s">"LOW VOLUME: {count} rows (expected >= {expected_min})"</span>, severity=<span class="s">"critical"</span>)
+        <span class="kw">elif</span> expected_max <span class="kw">and</span> count > expected_max:
+            self.alert(f<span class="s">"HIGH VOLUME: {count} rows (expected <= {expected_max})"</span>, severity=<span class="s">"warning"</span>)
+        <span class="kw">return</span> count
+
+    <span class="kw">def</span> alert(self, message: str, severity: str = <span class="s">"warning"</span>):
+        alert_payload = {
+            <span class="s">"pipeline"</span>: self.pipeline_name,
+            <span class="s">"severity"</span>: severity,
+            <span class="s">"message"</span>: message,
+            <span class="s">"timestamp"</span>: datetime.utcnow().isoformat()
+        }
+        self.logger.error(json.dumps(alert_payload))
+        <span class="c"># In production: send to PagerDuty, Teams, Slack webhook, etc.</span>
+
+    <span class="kw">def</span> finish(self):
+        duration = (datetime.utcnow() - self.start_time).total_seconds()
+        self.log_metric(<span class="s">"duration_seconds"</span>, duration, <span class="s">"seconds"</span>)
+        self.log_metric(<span class="s">"status"</span>, <span class="s">"success"</span>)
+
+<span class="c"># Usage</span>
+monitor = PipelineMonitor(<span class="s">"daily_orders_etl"</span>)
+count = monitor.check_volume(df, expected_min=1000, expected_max=100000)
+monitor.finish()</pre>
+      </div>
+
+      <div class="take-test-strip">
+        <span>Test your production knowledge</span>
+        <button class="btn-primary" onclick="scrollToSection('quiz-prod')">Take Quiz</button>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section class="lesson-section" data-section="quiz-prod" id="quiz-prod">
+      <h2 class="section-title">Production DE Quiz</h2>
+      <div id="quiz-production"></div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- ENTERPRISE PROJECTS -->
+    <!-- ============================================================ -->
+
+    <div style="margin:40px 0 24px;padding:24px;background:linear-gradient(135deg,#f0f4ff,#faf0ff);border-radius:16px;" id="project1">
+      <h2 style="font-size:24px;font-weight:800;margin:0 0 8px">8 Enterprise Projects</h2>
+      <p style="color:var(--muted);margin:0">Build production-grade data engineering systems. Each project covers end-to-end implementation with real architecture decisions.</p>
+    </div>
+
+    <!-- PROJECT 1 -->
+    <div class="project-card" id="project1">
+      <div class="project-header">
+        <div class="project-number">1</div>
+        <div>
+          <div class="project-title">E-Commerce Order Analytics Pipeline</div>
+          <div class="project-subtitle">Full ETL from transactional DB to analytics warehouse</div>
+        </div>
+      </div>
+      <div class="project-tags">
+        <span class="project-tag">PySpark</span>
+        <span class="project-tag green">Delta Lake</span>
+        <span class="project-tag purple">Azure ADF</span>
+        <span class="project-tag orange">Databricks</span>
+      </div>
+      <div class="content-block" style="margin-top:12px;">
+        <strong>Architecture:</strong> SQL Server (source) - ADF copy activity (Bronze ADLS) - Databricks notebook (Silver) - Gold aggregations - Power BI
+        <br><br>
+        <strong>Key features:</strong> CDC-based incremental load using order_updated_at watermark, SCD Type 2 for product dimension (track price history), daily KPI gold tables (revenue, AOV, conversion), automated data quality checks, email alerts on failure.
+      </div>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-header"><span>Core transformation logic</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="c"># Silver: Order enrichment</span>
+orders = spark.read.format(<span class="s">"delta"</span>).load(<span class="s">"/bronze/orders"</span>)
+customers = spark.read.format(<span class="s">"delta"</span>).load(<span class="s">"/silver/customers"</span>)
+products = spark.read.format(<span class="s">"delta"</span>).load(<span class="s">"/silver/products"</span>)
+
+<span class="c"># Enrich orders with customer and product info</span>
+enriched = orders \
+    .join(broadcast(customers.select(<span class="s">"customer_id"</span>, <span class="s">"tier"</span>, <span class="s">"country"</span>)), <span class="s">"customer_id"</span>, <span class="s">"left"</span>) \
+    .join(broadcast(products.select(<span class="s">"product_id"</span>, <span class="s">"category"</span>, <span class="s">"cost_price"</span>)), <span class="s">"product_id"</span>, <span class="s">"left"</span>) \
+    .withColumn(<span class="s">"gross_margin"</span>, (F.col(<span class="s">"unit_price"</span>) - F.col(<span class="s">"cost_price"</span>)) / F.col(<span class="s">"unit_price"</span>))
+
+<span class="c"># Gold: Daily KPIs</span>
+daily_kpis = enriched \
+    .filter(F.col(<span class="s">"status"</span>) == <span class="s">"completed"</span>) \
+    .groupBy(<span class="s">"order_date"</span>, <span class="s">"country"</span>, <span class="s">"category"</span>) \
+    .agg(
+        F.sum(<span class="s">"revenue"</span>).alias(<span class="s">"total_revenue"</span>),
+        F.avg(<span class="s">"revenue"</span>).alias(<span class="s">"aov"</span>),
+        F.avg(<span class="s">"gross_margin"</span>).alias(<span class="s">"avg_margin"</span>),
+        F.countDistinct(<span class="s">"customer_id"</span>).alias(<span class="s">"unique_buyers"</span>)
+    )</pre>
+      </div>
+    </div>
+
+    <!-- PROJECT 2 -->
+    <div class="project-card" id="project2">
+      <div class="project-header">
+        <div class="project-number" style="background:linear-gradient(135deg,#22c55e,#14b8a6)">2</div>
+        <div>
+          <div class="project-title">Real-Time Clickstream Analytics</div>
+          <div class="project-subtitle">Event streaming pipeline from Kafka to Delta Lake</div>
+        </div>
+      </div>
+      <div class="project-tags">
+        <span class="project-tag">Spark Streaming</span>
+        <span class="project-tag green">Kafka</span>
+        <span class="project-tag purple">Delta Lake</span>
+        <span class="project-tag orange">Event Hubs</span>
+      </div>
+      <div class="content-block" style="margin-top:12px;">
+        <strong>Architecture:</strong> Web app (events) - Azure Event Hub (Kafka-compatible) - Structured Streaming job (5-min micro-batches) - Delta Lake Silver - Real-time dashboard
+        <br><br>
+        <strong>Key features:</strong> Parse JSON clickstream events, sessionization (group events by session_id within 30-min gap), funnel analysis (view - add_to_cart - checkout - purchase), anomaly detection (bot traffic), checkpointing for exactly-once processing.
+      </div>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-header"><span>Structured Streaming from Event Hub</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="c"># Read from Azure Event Hub (Kafka protocol)</span>
+kafka_df = spark.readStream \
+    .format(<span class="s">"kafka"</span>) \
+    .option(<span class="s">"kafka.bootstrap.servers"</span>, event_hub_endpoint) \
+    .option(<span class="s">"subscribe"</span>, <span class="s">"clickstream"</span>) \
+    .option(<span class="s">"startingOffsets"</span>, <span class="s">"latest"</span>) \
+    .load()
+
+<span class="c"># Parse JSON payload</span>
+event_schema = StructType([
+    StructField(<span class="s">"session_id"</span>, StringType()),
+    StructField(<span class="s">"user_id"</span>, StringType()),
+    StructField(<span class="s">"event_type"</span>, StringType()),
+    StructField(<span class="s">"page"</span>, StringType()),
+    StructField(<span class="s">"timestamp"</span>, TimestampType())
+])
+events = kafka_df \
+    .select(F.from_json(F.col(<span class="s">"value"</span>).cast(<span class="s">"string"</span>), event_schema).alias(<span class="s">"e"</span>)) \
+    .select(<span class="s">"e.*"</span>)
+
+<span class="c"># Write with 5-minute micro-batches</span>
+events.writeStream \
+    .format(<span class="s">"delta"</span>) \
+    .outputMode(<span class="s">"append"</span>) \
+    .option(<span class="s">"checkpointLocation"</span>, <span class="s">"/checkpoints/clickstream"</span>) \
+    .trigger(processingTime=<span class="s">"5 minutes"</span>) \
+    .start(<span class="s">"/silver/clickstream"</span>)</pre>
+      </div>
+    </div>
+
+    <!-- PROJECT 3 -->
+    <div class="project-card" id="project3">
+      <div class="project-header">
+        <div class="project-number" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)">3</div>
+        <div>
+          <div class="project-title">Enterprise Data Lakehouse Platform</div>
+          <div class="project-subtitle">Multi-domain Medallion architecture with Unity Catalog governance</div>
+        </div>
+      </div>
+      <div class="project-tags">
+        <span class="project-tag">Unity Catalog</span>
+        <span class="project-tag green">Delta Lake</span>
+        <span class="project-tag purple">Databricks</span>
+        <span class="project-tag orange">ADLS Gen2</span>
+      </div>
+      <div class="content-block" style="margin-top:12px;">
+        <strong>Architecture:</strong> Multiple source systems (CRM, ERP, Marketing) - Domain-specific Bronze zones - Shared Silver canonical layer - Business-domain Gold marts - Unity Catalog governs access per domain team
+        <br><br>
+        <strong>Key features:</strong> Column-level access control (PII masking), data lineage tracking, cross-domain joins at Silver layer, row-level security in Gold, automated OPTIMIZE/VACUUM jobs, table tagging and documentation.
+      </div>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-header"><span>Unity Catalog - Governance Setup</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="c">-- Create catalog structure</span>
+CREATE CATALOG IF NOT EXISTS ecommerce;
+CREATE SCHEMA IF NOT EXISTS ecommerce.bronze;
+CREATE SCHEMA IF NOT EXISTS ecommerce.silver;
+CREATE SCHEMA IF NOT EXISTS ecommerce.gold;
+
+<span class="c">-- Grant schema-level access by team</span>
+GRANT USE SCHEMA ON SCHEMA ecommerce.gold TO analytics_team;
+GRANT SELECT ON TABLE ecommerce.gold.daily_revenue TO analysts;
+
+<span class="c">-- Create masked view for PII columns</span>
+CREATE OR REPLACE VIEW ecommerce.gold.customers_masked AS
+SELECT
+    customer_id,
+    CASE WHEN is_member('pii_allowed') THEN email
+         ELSE CONCAT(LEFT(email, 2), '***@***.com') END AS email,
+    country,
+    customer_tier
+FROM ecommerce.silver.customers;
+
+<span class="c">-- Row-level security: each region team sees only their data</span>
+CREATE ROW ACCESS POLICY region_filter
+AS (region STRING) RETURNS BOOLEAN
+AS RETURN region = current_user_region();
+
+ALTER TABLE ecommerce.gold.daily_revenue
+ADD ROW ACCESS POLICY region_filter ON (region);</pre>
+      </div>
+    </div>
+
+    <!-- PROJECT 4 -->
+    <div class="project-card" id="project4">
+      <div class="project-header">
+        <div class="project-number" style="background:linear-gradient(135deg,#f97316,#f59e0b)">4</div>
+        <div>
+          <div class="project-title">Financial Regulatory Reporting Pipeline</div>
+          <div class="project-subtitle">BCBS 239 compliant data lineage and audit trail</div>
+        </div>
+      </div>
+      <div class="project-tags">
+        <span class="project-tag">Compliance</span>
+        <span class="project-tag green">Audit Trail</span>
+        <span class="project-tag purple">Delta Time Travel</span>
+        <span class="project-tag orange">Data Lineage</span>
+      </div>
+      <div class="content-block" style="margin-top:12px;">
+        <strong>Key requirements:</strong> Every number on a regulatory report must be traceable to its source. Any historical data must be reproducible. Changes to methodology must not alter historical reports.
+        <br><br>
+        <strong>How Delta Lake solves this:</strong> Time travel lets you query data as it was on any date. Every write creates a new version. You can prove "our Q3 2023 report used data version 45 of the positions table."
+      </div>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-header"><span>Regulatory Snapshot and Audit Trail</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="c"># Regulatory report as of quarter-end</span>
+<span class="c"># Delta time travel - query data as it was on a specific date</span>
+positions_at_qend = spark.read \
+    .format(<span class="s">"delta"</span>) \
+    .option(<span class="s">"timestampAsOf"</span>, <span class="s">"2024-03-31 23:59:59"</span>) \
+    .load(<span class="s">"/delta/positions"</span>)
+
+<span class="c"># OR by version number (auditable)</span>
+positions_v45 = spark.read \
+    .format(<span class="s">"delta"</span>) \
+    .option(<span class="s">"versionAsOf"</span>, 45) \
+    .load(<span class="s">"/delta/positions"</span>)
+
+<span class="c"># Store which version was used for each report (audit metadata)</span>
+report_metadata = {
+    <span class="s">"report_id"</span>: <span class="s">"BCBS_Q1_2024"</span>,
+    <span class="s">"generated_at"</span>: <span class="s">"2024-04-05T09:00:00Z"</span>,
+    <span class="s">"data_sources"</span>: {
+        <span class="s">"positions"</span>: {<span class="s">"version"</span>: 45, <span class="s">"timestamp"</span>: <span class="s">"2024-03-31"</span>},
+        <span class="s">"fx_rates"</span>: {<span class="s">"version"</span>: 128, <span class="s">"timestamp"</span>: <span class="s">"2024-03-31"</span>}
+    }
+}
+<span class="c"># Write metadata to audit table for future reference</span></pre>
+      </div>
+    </div>
+
+    <!-- PROJECT 5 -->
+    <div class="project-card" id="project5">
+      <div class="project-header">
+        <div class="project-number" style="background:linear-gradient(135deg,#14b8a6,#22c55e)">5</div>
+        <div>
+          <div class="project-title">ML Feature Store</div>
+          <div class="project-subtitle">Reusable feature pipeline for data science teams</div>
+        </div>
+      </div>
+      <div class="project-tags">
+        <span class="project-tag">Feature Engineering</span>
+        <span class="project-tag green">MLflow</span>
+        <span class="project-tag purple">Databricks</span>
+        <span class="project-tag orange">Point-in-Time</span>
+      </div>
+      <div class="content-block" style="margin-top:12px;">
+        <strong>Problem:</strong> Without a feature store, every ML team re-derives the same features (customer LTV, 30-day spend, churn score) independently - wasting compute, causing inconsistency between training and serving.
+        <br><br>
+        <strong>Solution:</strong> Centralized feature tables with point-in-time correct lookups. Features computed once, reused by any model. Training uses historical feature values - no data leakage.
+      </div>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-header"><span>Building and Registering Features</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="kw">from</span> databricks.feature_store <span class="kw">import</span> FeatureStoreClient
+fs = FeatureStoreClient()
+
+<span class="c"># Compute customer features</span>
+<span class="kw">def</span> compute_customer_features(orders_df):
+    w30 = Window.partitionBy(<span class="s">"customer_id"</span>) \
+        .orderBy(F.col(<span class="s">"order_date"</span>).cast(<span class="s">"long"</span>)) \
+        .rangeBetween(-30 * 86400, 0)
+    <span class="kw">return</span> orders_df.withColumn(
+        <span class="s">"spend_30d"</span>, F.sum(<span class="s">"amount"</span>).over(w30)
+    ).withColumn(
+        <span class="s">"order_count_30d"</span>, F.count(<span class="s">"*"</span>).over(w30)
+    ).withColumn(
+        <span class="s">"days_since_last_order"</span>, F.datediff(F.current_date(), F.max(<span class="s">"order_date"</span>).over(w30))
+    ).groupBy(<span class="s">"customer_id"</span>).agg(
+        F.last(<span class="s">"spend_30d"</span>).alias(<span class="s">"spend_30d"</span>),
+        F.last(<span class="s">"order_count_30d"</span>).alias(<span class="s">"order_count_30d"</span>),
+        F.last(<span class="s">"days_since_last_order"</span>).alias(<span class="s">"days_since_last_order"</span>)
+    )
+
+features_df = compute_customer_features(orders)
+
+<span class="c"># Register in Feature Store</span>
+fs.create_table(
+    name=<span class="s">"ecommerce.customer_features"</span>,
+    primary_keys=[<span class="s">"customer_id"</span>],
+    timestamp_keys=[<span class="s">"feature_date"</span>],  <span class="c"># for point-in-time lookup</span>
+    df=features_df
+)
+
+<span class="c"># Training: get features with point-in-time join</span>
+training_set = fs.create_training_set(
+    labels_df,
+    feature_lookups=[FeatureLookup(<span class="s">"ecommerce.customer_features"</span>, <span class="s">"customer_id"</span>)],
+    label=<span class="s">"churned"</span>,
+    timestamp_lookup_key=<span class="s">"label_date"</span>
+)</pre>
+      </div>
+    </div>
+
+    <!-- PROJECT 6 -->
+    <div class="project-card" id="project6">
+      <div class="project-header">
+        <div class="project-number" style="background:linear-gradient(135deg,#ef4444,#f97316)">6</div>
+        <div>
+          <div class="project-title">Multi-Cloud Data Migration</div>
+          <div class="project-subtitle">Migrate on-prem Hadoop to Azure Databricks</div>
+        </div>
+      </div>
+      <div class="project-tags">
+        <span class="project-tag">Migration</span>
+        <span class="project-tag green">ADLS</span>
+        <span class="project-tag purple">Databricks</span>
+        <span class="project-tag orange">ADF</span>
+      </div>
+      <div class="content-block" style="margin-top:12px;">
+        <strong>Migration steps:</strong> Inventory on-prem data (table catalog, row counts, schemas) - Assess complexity (partitioned tables, custom UDFs, Hive-specific features) - Parallel run (both systems active, validate parity) - Cutover (switch writers to new system) - Decommission old system.
+        <br><br>
+        <strong>Key patterns:</strong> Use Azure Data Box for initial bulk transfer. ADF for ongoing sync during migration window. Databricks Auto Loader for continuous ingestion after cutover.
+      </div>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-header"><span>Auto Loader - Continuous Cloud Ingestion</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="c"># Auto Loader: detect and process new files in ADLS automatically</span>
+df = spark.readStream \
+    .format(<span class="s">"cloudFiles"</span>) \
+    .option(<span class="s">"cloudFiles.format"</span>, <span class="s">"parquet"</span>) \
+    .option(<span class="s">"cloudFiles.schemaLocation"</span>, <span class="s">"/checkpoints/orders_schema"</span>) \
+    .option(<span class="s">"cloudFiles.inferColumnTypes"</span>, <span class="s">"true"</span>) \
+    .load(<span class="s">"abfss://landing@storage.dfs.core.windows.net/orders/"</span>)
+
+<span class="c"># Add metadata columns</span>
+df = df \
+    .withColumn(<span class="s">"_source_file"</span>, F.input_file_name()) \
+    .withColumn(<span class="s">"_loaded_at"</span>, F.current_timestamp())
+
+<span class="c"># Write to Bronze Delta table</span>
+df.writeStream \
+    .format(<span class="s">"delta"</span>) \
+    .outputMode(<span class="s">"append"</span>) \
+    .option(<span class="s">"mergeSchema"</span>, <span class="s">"true"</span>) \
+    .option(<span class="s">"checkpointLocation"</span>, <span class="s">"/checkpoints/orders"</span>) \
+    .trigger(availableNow=True) \
+    .start(<span class="s">"/bronze/orders"</span>)</pre>
+      </div>
+    </div>
+
+    <!-- PROJECT 7 -->
+    <div class="project-card" id="project7">
+      <div class="project-header">
+        <div class="project-number" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">7</div>
+        <div>
+          <div class="project-title">IoT Sensor Data Streaming Platform</div>
+          <div class="project-subtitle">Process millions of sensor events per second</div>
+        </div>
+      </div>
+      <div class="project-tags">
+        <span class="project-tag">IoT Hub</span>
+        <span class="project-tag green">Spark Streaming</span>
+        <span class="project-tag purple">Time Series</span>
+        <span class="project-tag orange">Anomaly Detection</span>
+      </div>
+      <div class="content-block" style="margin-top:12px;">
+        <strong>Architecture:</strong> 10,000 factory sensors - Azure IoT Hub - Event Hub - Spark Structured Streaming - Rolling aggregations (1min, 5min, 1hr) - Delta Lake - Real-time anomaly alerts
+        <br><br>
+        <strong>Key patterns:</strong> Watermarking for late-arriving data (sensors sometimes buffer and send delayed), session windows for device activity detection, stateful processing to track per-device running averages.
+      </div>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-header"><span>Windowed Aggregations with Watermarks</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="c"># Allow up to 10 minutes of late data</span>
+readings = events \
+    .withWatermark(<span class="s">"event_time"</span>, <span class="s">"10 minutes"</span>)
+
+<span class="c"># 1-minute tumbling window aggregation</span>
+one_min_agg = readings \
+    .groupBy(
+        F.window(F.col(<span class="s">"event_time"</span>), <span class="s">"1 minute"</span>),
+        <span class="s">"device_id"</span>
+    ) \
+    .agg(
+        F.avg(<span class="s">"temperature"</span>).alias(<span class="s">"avg_temp"</span>),
+        F.max(<span class="s">"temperature"</span>).alias(<span class="s">"max_temp"</span>),
+        F.count(<span class="s">"*"</span>).alias(<span class="s">"reading_count"</span>)
+    )
+
+<span class="c"># Sliding window: 5-min window, slide every 1 min</span>
+sliding_agg = readings \
+    .withWatermark(<span class="s">"event_time"</span>, <span class="s">"10 minutes"</span>) \
+    .groupBy(
+        F.window(F.col(<span class="s">"event_time"</span>), <span class="s">"5 minutes"</span>, <span class="s">"1 minute"</span>),
+        <span class="s">"device_id"</span>
+    ) \
+    .agg(F.avg(<span class="s">"temperature"</span>).alias(<span class="s">"avg_5min"</span>))</pre>
+      </div>
+    </div>
+
+    <!-- PROJECT 8 -->
+    <div class="project-card" id="project8">
+      <div class="project-header">
+        <div class="project-number" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)">8</div>
+        <div>
+          <div class="project-title">Data Mesh Implementation</div>
+          <div class="project-subtitle">Domain-oriented decentralized data ownership</div>
+        </div>
+      </div>
+      <div class="project-tags">
+        <span class="project-tag">Data Mesh</span>
+        <span class="project-tag green">Domain-Oriented</span>
+        <span class="project-tag purple">Data Products</span>
+        <span class="project-tag orange">Self-Service</span>
+      </div>
+      <div class="content-block" style="margin-top:12px;">
+        <strong>Core Data Mesh Principles:</strong>
+        <ul style="margin:8px 0;padding-left:20px;line-height:1.8;font-size:13px;">
+          <li><strong>Domain ownership:</strong> The orders team owns and publishes the orders data product - not a central DE team</li>
+          <li><strong>Data as a product:</strong> Each domain team publishes SLA-backed, documented, discoverable data products</li>
+          <li><strong>Self-serve platform:</strong> Infrastructure (Databricks, Unity Catalog) enables any domain to build their pipeline without help from platform team</li>
+          <li><strong>Federated governance:</strong> Global policies (PII handling, retention) applied centrally; domain-specific rules owned by domains</li>
+        </ul>
+        <br>
+        <strong>Implementation with Unity Catalog:</strong> Each domain gets their own catalog (orders_domain, customers_domain, marketing_domain). Cross-domain reads go through published APIs (approved Delta Sharing tables). Unity Catalog tracks lineage across domains automatically.
+      </div>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-header"><span>Delta Sharing - Publishing Data Products</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="c">-- Orders domain publishes data product via Delta Sharing</span>
+CREATE SHARE orders_domain_product;
+
+ADD TABLE orders_domain.gold.daily_order_summary
+TO SHARE orders_domain_product
+WITH HISTORY;
+
+ADD TABLE orders_domain.gold.order_items_enriched
+TO SHARE orders_domain_product;
+
+<span class="c">-- Grant access to marketing domain</span>
+GRANT SELECT ON SHARE orders_domain_product
+TO RECIPIENT marketing_domain;
+
+<span class="c">-- Marketing domain consumes the data product</span>
+<span class="c">-- (reads from orders domain without direct access to underlying storage)</span>
+CREATE CATALOG marketing_domain_data
+USING SHARE orders_domain_product;
+
+SELECT * FROM marketing_domain_data.gold.daily_order_summary
+WHERE order_date >= '2024-01-01';</pre>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Auth Modal -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAuth()">x</button>
+    <h2>Sign In</h2>
+    <button class="btn-google" onclick="signInGoogle()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+      Continue with Google
+    </button>
+    <div class="auth-divider">or</div>
+    <input type="email" id="auth-email" placeholder="Email address" class="auth-input">
+    <input type="password" id="auth-pass" placeholder="Password" class="auth-input">
+    <button class="btn-primary" style="width:100%" onclick="signInEmail()">Sign In / Register</button>
+  </div>
+</div>
+
+<script src="js/firebase.js"></script>
+<script>
+initQuiz('quiz-production', [
+  {
+    question: "What does 'idempotent pipeline' mean?",
+    options: ["The pipeline runs infinitely", "Running the pipeline twice produces the same result as running it once", "The pipeline has no side effects", "The pipeline never fails"],
+    correct: 1,
+    explanation: "An idempotent pipeline can be safely re-run without producing duplicates or incorrect results. Achieved via MERGE instead of INSERT, overwrite partitions instead of appending, and tracking watermarks."
+  },
+  {
+    question: "In Medallion architecture, what happens to bad data (nulls, invalid records) in the Bronze layer?",
+    options: ["They are deleted immediately", "Bronze stores everything as-is including bad data - it is never modified", "They are corrected automatically", "Bronze rejects bad records"],
+    correct: 1,
+    explanation: "Bronze is the raw landing zone - an exact copy of source data, never modified. Bad data, duplicates, and wrong types stay in Bronze. Silver is where you clean and validate. This lets you replay Bronze if your cleaning logic changes."
+  },
+  {
+    question: "Why is the Silver layer better for analysts than Bronze?",
+    options: ["Silver is faster to read", "Silver is deduplicated, validated, has correct types, and nulls are handled", "Silver costs less to store", "Silver has more columns"],
+    correct: 1,
+    explanation: "Silver applies cleaning: deduplication, schema validation, type casting, null handling, and basic business rules. Analysts can trust Silver data. Bronze may have duplicates from retries, wrong string types, and missing required fields."
+  },
+  {
+    question: "What is the purpose of a dead-letter / quarantine table?",
+    options: ["Store deleted data", "Isolate bad records so the pipeline continues processing valid data", "Archive old records", "Store pipeline logs"],
+    correct: 1,
+    explanation: "Instead of failing the entire pipeline when bad records appear, quarantine them to a separate table. The 99% valid records continue processing. Then you can investigate and replay quarantined records after fixing the root cause."
+  },
+  {
+    question: "In CI/CD for data pipelines, what should unit tests verify?",
+    options: ["That the Databricks cluster starts successfully", "That transformation logic produces correct output for known input DataFrames", "That the source database is accessible", "That the output files are the right size"],
+    correct: 1,
+    explanation: "Unit tests for data pipelines verify business logic: given a specific input DataFrame, the transformation produces the expected output. Test edge cases: nulls, empty DataFrames, duplicates, boundary values."
+  }
+], 'production-de');
+</script>
+</body>
+</html>
