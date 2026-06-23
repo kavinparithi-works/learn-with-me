@@ -491,7 +491,7 @@
 
       <div class="card">
         <h3>&#127759; Azure Global Infrastructure</h3>
-        <p>Microsoft Azure operates <strong>60+ regions</strong> worldwide, making it one of the largest cloud providers globally. Each region contains <strong>Availability Zones (AZs)</strong> — three or more physically separate datacenters within a region, each with independent power, cooling, and networking. This allows you to build fault-tolerant applications that survive datacenter-level outages.</p>
+        <p>Microsoft Azure operates <strong>60+ regions</strong> worldwide, making it one of the largest cloud providers globally. Each region contains <strong>Availability Zones (AZs)</strong> - three or more physically separate datacenters within a region, each with independent power, cooling, and networking. This allows you to build fault-tolerant applications that survive datacenter-level outages.</p>
         <ul style="margin-top:10px;">
           <li><strong>Region</strong>: Geographic area (e.g., East US, West Europe, Southeast Asia)</li>
           <li><strong>Availability Zone</strong>: Physically separate datacenter within a region</li>
@@ -503,10 +503,10 @@
         <h3>&#128274; Azure Organizational Hierarchy</h3>
         <p>Azure organizes resources in a strict four-level hierarchy. Understanding this is critical for permissions, billing, and resource management.</p>
         <div class="tree" style="margin-top:14px;">
-          <div class="tree-line"><span class="label">&#128100; Azure AD Tenant</span> <span class="desc">&nbsp;&mdash; org-level identity provider (e.g., yourcompany.onmicrosoft.com)</span></div>
-          <div class="tree-line">&nbsp;&nbsp;&#9492;&#9472;&#9472; <span class="label">&#128179; Subscription</span> <span class="desc">&mdash; billing unit; you can have multiple (Dev, Staging, Prod)</span></div>
-          <div class="tree-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9492;&#9472;&#9472; <span class="label">&#128193; Resource Group</span> <span class="desc">&mdash; logical container for related resources</span></div>
-          <div class="tree-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9492;&#9472;&#9472; <span class="label">&#128736;&#65039; Resources</span> <span class="desc">&mdash; Storage, Databricks, ADF, Key Vault, etc.</span></div>
+          <div class="tree-line"><span class="label">&#128100; Azure AD Tenant</span> <span class="desc">&nbsp; -  org-level identity provider (e.g., yourcompany.onmicrosoft.com)</span></div>
+          <div class="tree-line">&nbsp;&nbsp;&#9492;&#9472;&#9472; <span class="label">&#128179; Subscription</span> <span class="desc"> -  billing unit; you can have multiple (Dev, Staging, Prod)</span></div>
+          <div class="tree-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9492;&#9472;&#9472; <span class="label">&#128193; Resource Group</span> <span class="desc"> -  logical container for related resources</span></div>
+          <div class="tree-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9492;&#9472;&#9472; <span class="label">&#128736;&#65039; Resources</span> <span class="desc"> -  Storage, Databricks, ADF, Key Vault, etc.</span></div>
         </div>
       </div>
 
@@ -538,21 +538,21 @@
       <div class="info-grid">
         <div class="info-box">
           <h4>&#128197; Deploy &amp; Delete Together</h4>
-          <p>Delete the resource group and all resources inside vanish atomically — perfect for dev/test environments.</p>
+          <p>Delete the resource group and all resources inside vanish atomically - perfect for dev/test environments.</p>
         </div>
         <div class="info-box">
           <h4>&#128274; Group-Level Permissions</h4>
-          <p>Assign an RBAC role at the resource group level and it applies to every resource inside — no per-resource setup needed.</p>
+          <p>Assign an RBAC role at the resource group level and it applies to every resource inside - no per-resource setup needed.</p>
         </div>
         <div class="info-box">
           <h4>&#128200; Cost Tracking</h4>
-          <p>Azure Cost Management aggregates costs per resource group — see exactly how much your data platform costs monthly.</p>
+          <p>Azure Cost Management aggregates costs per resource group - see exactly how much your data platform costs monthly.</p>
         </div>
       </div>
 
       <!-- QUIZ 7.1 -->
       <div class="quiz-box" id="quiz71">
-        <div class="quiz-title">&#129504; Quiz 7.1 — Azure Basics</div>
+        <div class="quiz-title">&#129504; Quiz 7.1 - Azure Basics</div>
         <div class="quiz-q" id="q71_1">
           <div class="quiz-q-text">1. What is the correct hierarchy order in Azure (top to bottom)?</div>
           <div class="quiz-options">
@@ -590,17 +590,17 @@
       <div class="section-title">
         <span class="badge">7.2</span> Storage Account + Blob Storage
       </div>
-      <div class="section-subtitle">Azure's object storage service — the foundation of every data lake</div>
+      <div class="section-subtitle">Azure's object storage service - the foundation of every data lake</div>
       <div class="divider"></div>
 
       <div class="card">
         <h3>&#128190; Azure Storage Account</h3>
         <p>A <strong>Storage Account</strong> is an umbrella service that provides access to multiple Azure Storage services under a single namespace. Think of it as the "account" that contains everything. Within a Storage Account you can have:</p>
         <ul style="margin-top:8px;">
-          <li><strong>Blob Storage</strong> — unstructured object storage (CSV, Parquet, JSON, images, videos)</li>
-          <li><strong>File Storage</strong> — managed file shares (SMB/NFS protocol)</li>
-          <li><strong>Queue Storage</strong> — message queuing for async communication</li>
-          <li><strong>Table Storage</strong> — NoSQL key-value store</li>
+          <li><strong>Blob Storage</strong> - unstructured object storage (CSV, Parquet, JSON, images, videos)</li>
+          <li><strong>File Storage</strong> - managed file shares (SMB/NFS protocol)</li>
+          <li><strong>Queue Storage</strong> - message queuing for async communication</li>
+          <li><strong>Table Storage</strong> - NoSQL key-value store</li>
         </ul>
       </div>
 
@@ -608,9 +608,9 @@
         <h3>&#128452; Blob Storage Hierarchy</h3>
         <p><strong>Blob Storage</strong> holds unstructured data. The structure is:</p>
         <ul style="margin-top:8px;">
-          <li><strong>Container</strong> — top-level folder (like an S3 bucket). Can be public or private.</li>
-          <li><strong>Blob</strong> — the actual file. Three types: Block Blob (large files), Append Blob (logs), Page Blob (VHDs)</li>
-          <li><strong>Virtual directory</strong> — folders are simulated using "/" in blob names (no real hierarchy in plain Blob)</li>
+          <li><strong>Container</strong> - top-level folder (like an S3 bucket). Can be public or private.</li>
+          <li><strong>Blob</strong> - the actual file. Three types: Block Blob (large files), Append Blob (logs), Page Blob (VHDs)</li>
+          <li><strong>Virtual directory</strong> - folders are simulated using "/" in blob names (no real hierarchy in plain Blob)</li>
         </ul>
       </div>
 
@@ -632,7 +632,7 @@
         <button class="replay-btn" onclick="startStorageAnim()">&#8635; Replay</button>
         <div class="storage-tree" id="storageTree">
           <div class="storage-node">
-            <div class="storage-folder"><span>&#128190;</span> <strong>datalakestorage01</strong> <span style="color:var(--text-muted);font-size:.75rem;">&nbsp;&mdash; Storage Account</span></div>
+            <div class="storage-folder"><span>&#128190;</span> <strong>datalakestorage01</strong> <span style="color:var(--text-muted);font-size:.75rem;">&nbsp; -  Storage Account</span></div>
             <div style="padding-left:20px;">
               <div class="storage-node" id="sf-raw">
                 <div class="storage-folder"><span class="folder-icon">&#9658;</span><span>&#128193;</span> <strong>raw</strong></div>
@@ -698,7 +698,7 @@ df_clean.write.<span class="fn">mode</span>(<span class="str">"overwrite"</span>
 
       <!-- QUIZ 7.2 -->
       <div class="quiz-box" id="quiz72">
-        <div class="quiz-title">&#129504; Quiz 7.2 — Blob Storage</div>
+        <div class="quiz-title">&#129504; Quiz 7.2 - Blob Storage</div>
         <div class="quiz-q" id="q72_1">
           <div class="quiz-q-text">1. Which access tier requires hours to retrieve data and is cheapest for storage?</div>
           <div class="quiz-options">
@@ -736,15 +736,15 @@ df_clean.write.<span class="fn">mode</span>(<span class="str">"overwrite"</span>
       <div class="section-title">
         <span class="badge">7.3</span> ADLS Gen2
       </div>
-      <div class="section-subtitle">Azure Data Lake Storage Gen2 — hierarchical namespace, ACLs, and why it's the recommended data lake storage</div>
+      <div class="section-subtitle">Azure Data Lake Storage Gen2 - hierarchical namespace, ACLs, and why it's the recommended data lake storage</div>
       <div class="divider"></div>
 
       <div class="card">
         <h3>&#127759; What is ADLS Gen2?</h3>
-        <p><strong>Azure Data Lake Storage Gen2</strong> is Blob Storage with <strong>Hierarchical Namespace (HNS)</strong> enabled. This single setting transforms flat object storage into a true filesystem with real directories — not simulated ones.</p>
+        <p><strong>Azure Data Lake Storage Gen2</strong> is Blob Storage with <strong>Hierarchical Namespace (HNS)</strong> enabled. This single setting transforms flat object storage into a true filesystem with real directories - not simulated ones.</p>
         <ul style="margin-top:8px;">
           <li><strong>Hierarchical Namespace</strong>: True directory structure like a Linux filesystem. Rename or delete a directory is a single atomic operation regardless of how many files are inside.</li>
-          <li><strong>ACL Permissions</strong>: Unix-style Access Control Lists applied per file or per directory — not just at container level.</li>
+          <li><strong>ACL Permissions</strong>: Unix-style Access Control Lists applied per file or per directory - not just at container level.</li>
           <li><strong>ABFS Driver</strong>: Azure Blob File System driver, Hadoop-compatible. Spark uses <code>abfss://</code> protocol.</li>
           <li><strong>Performance</strong>: Optimized for big data analytics workloads (Spark, Hive, Presto).</li>
         </ul>
@@ -754,9 +754,9 @@ df_clean.write.<span class="fn">mode</span>(<span class="str">"overwrite"</span>
         <h3>&#128274; ACL Permissions (Unix-style)</h3>
         <p>Each file/folder has three permission bits:</p>
         <div class="info-grid" style="margin-top:10px;">
-          <div class="info-box"><h4>r &mdash; Read</h4><p>List directory contents or read file data</p></div>
-          <div class="info-box"><h4>w &mdash; Write</h4><p>Create or modify files in the directory</p></div>
-          <div class="info-box"><h4>x &mdash; Execute</h4><p>Navigate into the directory (required to traverse path)</p></div>
+          <div class="info-box"><h4>r  -  Read</h4><p>List directory contents or read file data</p></div>
+          <div class="info-box"><h4>w  -  Write</h4><p>Create or modify files in the directory</p></div>
+          <div class="info-box"><h4>x  -  Execute</h4><p>Navigate into the directory (required to traverse path)</p></div>
         </div>
         <p style="margin-top:8px;font-size:.88rem;color:var(--text-muted);">Permissions are applied to: <strong>Named user</strong> (specific user/service principal), <strong>Named group</strong>, or <strong>Other</strong> (everyone else).</p>
       </div>
@@ -792,7 +792,7 @@ df_clean.write.<span class="fn">mode</span>(<span class="str">"overwrite"</span>
 
       <!-- QUIZ 7.3 -->
       <div class="quiz-box" id="quiz73">
-        <div class="quiz-title">&#129504; Quiz 7.3 &mdash; ADLS Gen2</div>
+        <div class="quiz-title">&#129504; Quiz 7.3  -  ADLS Gen2</div>
         <div class="quiz-q" id="q73_1">
           <div class="quiz-q-text">1. What key feature distinguishes ADLS Gen2 from plain Blob Storage?</div>
           <div class="quiz-options">
@@ -816,7 +816,7 @@ df_clean.write.<span class="fn">mode</span>(<span class="str">"overwrite"</span>
           <div class="quiz-options">
             <div class="quiz-opt" data-q="q73_3" data-val="a">a) It's slower because it must update more metadata</div>
             <div class="quiz-opt" data-q="q73_3" data-val="b">b) It copies all files to the new path (same as blob)</div>
-            <div class="quiz-opt" data-q="q73_3" data-val="c">c) Atomic O(1) operation — instant regardless of how many files are inside</div>
+            <div class="quiz-opt" data-q="q73_3" data-val="c">c) Atomic O(1) operation - instant regardless of how many files are inside</div>
             <div class="quiz-opt" data-q="q73_3" data-val="d">d) It is not supported</div>
           </div>
         </div>
@@ -830,13 +830,13 @@ df_clean.write.<span class="fn">mode</span>(<span class="str">"overwrite"</span>
       <div class="section-title">
         <span class="badge">7.4</span> Identity and Access
       </div>
-      <div class="section-subtitle">Service Principals, Managed Identities, and RBAC — securing your Azure data platform</div>
+      <div class="section-subtitle">Service Principals, Managed Identities, and RBAC - securing your Azure data platform</div>
       <div class="divider"></div>
 
       <div class="info-grid">
         <div class="info-box">
           <h4>&#128101; Service Principal</h4>
-          <p>An app identity — like a user account for an application. Has a <strong>client_id</strong> + <strong>client_secret</strong> (or certificate). You manage and rotate the secrets yourself.</p>
+          <p>An app identity - like a user account for an application. Has a <strong>client_id</strong> + <strong>client_secret</strong> (or certificate). You manage and rotate the secrets yourself.</p>
         </div>
         <div class="info-box">
           <h4>&#9989; Managed Identity</h4>
@@ -844,7 +844,7 @@ df_clean.write.<span class="fn">mode</span>(<span class="str">"overwrite"</span>
         </div>
         <div class="info-box">
           <h4>&#128274; RBAC</h4>
-          <p><strong>Role-Based Access Control</strong> — assign built-in or custom roles to identities at any scope (subscription, resource group, or resource).</p>
+          <p><strong>Role-Based Access Control</strong> - assign built-in or custom roles to identities at any scope (subscription, resource group, or resource).</p>
         </div>
       </div>
 
@@ -927,7 +927,7 @@ df_clean.write.<span class="fn">mode</span>(<span class="str">"overwrite"</span>
       <!-- CODE 7.4 -->
       <div class="code-block">
         <div class="code-header">
-          <span class="code-lang">Python — Managed Identity</span>
+          <span class="code-lang">Python - Managed Identity</span>
           <button class="copy-btn" onclick="copyCode(this)">Copy</button>
         </div>
         <pre><code><span class="cm"># Managed Identity in Databricks (no credentials needed!)</span>
@@ -935,7 +935,7 @@ df_clean.write.<span class="fn">mode</span>(<span class="str">"overwrite"</span>
 df = spark.read.<span class="fn">format</span>(<span class="str">"delta"</span>).<span class="fn">load</span>(
     <span class="str">"abfss://silver@datalakestorage01.dfs.core.windows.net/employees/"</span>
 )
-<span class="cm"># No keys, no secrets — Managed Identity handles auth transparently</span>
+<span class="cm"># No keys, no secrets - Managed Identity handles auth transparently</span>
 
 <span class="cm"># Check current identity (in a Databricks notebook)</span>
 <span class="kw">import</span> subprocess
@@ -945,7 +945,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
 
       <div class="code-block">
         <div class="code-header">
-          <span class="code-lang">JSON — ADF Linked Service with MSI</span>
+          <span class="code-lang">JSON - ADF Linked Service with MSI</span>
           <button class="copy-btn" onclick="copyCode(this)">Copy</button>
         </div>
         <pre><code>{
@@ -961,12 +961,12 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
 
       <!-- QUIZ 7.4 -->
       <div class="quiz-box" id="quiz74">
-        <div class="quiz-title">&#129504; Quiz 7.4 &mdash; Identity and Access</div>
+        <div class="quiz-title">&#129504; Quiz 7.4  -  Identity and Access</div>
         <div class="quiz-q" id="q74_1">
           <div class="quiz-q-text">1. What is the main advantage of Managed Identity over Service Principal?</div>
           <div class="quiz-options">
             <div class="quiz-opt" data-q="q74_1" data-val="a">a) Managed Identity has more permissions by default</div>
-            <div class="quiz-opt" data-q="q74_1" data-val="b">b) Azure automatically manages credentials — no secrets to store or rotate</div>
+            <div class="quiz-opt" data-q="q74_1" data-val="b">b) Azure automatically manages credentials - no secrets to store or rotate</div>
             <div class="quiz-opt" data-q="q74_1" data-val="c">c) Managed Identity works outside of Azure</div>
             <div class="quiz-opt" data-q="q74_1" data-val="d">d) Managed Identity is cheaper than Service Principal</div>
           </div>
@@ -999,12 +999,12 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
       <div class="section-title">
         <span class="badge">8.1</span> Azure Data Factory (ADF)
       </div>
-      <div class="section-subtitle">Cloud ETL and orchestration — move and transform data without writing Spark code</div>
+      <div class="section-subtitle">Cloud ETL and orchestration - move and transform data without writing Spark code</div>
       <div class="divider"></div>
 
       <div class="card">
         <h3>&#9881;&#65039; What is Azure Data Factory?</h3>
-        <p>ADF is a <strong>serverless data integration and orchestration service</strong>. It connects 100+ data sources (databases, SaaS apps, files) and orchestrates complex workflows. You build pipelines visually or with JSON — no cluster management needed.</p>
+        <p>ADF is a <strong>serverless data integration and orchestration service</strong>. It connects 100+ data sources (databases, SaaS apps, files) and orchestrates complex workflows. You build pipelines visually or with JSON - no cluster management needed.</p>
         <p style="margin-top:8px;">Best for: <strong>data movement</strong>, <strong>orchestration</strong>, <strong>scheduled pipelines</strong>, <strong>connecting heterogeneous sources</strong>. Not ideal for complex in-memory transformations (use Databricks for that).</p>
       </div>
 
@@ -1019,7 +1019,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
         </div>
         <div class="info-box">
           <h4>&#128190; Dataset</h4>
-          <p>A named view of data — describes the structure and location of data in a Linked Service.</p>
+          <p>A named view of data - describes the structure and location of data in a Linked Service.</p>
         </div>
         <div class="info-box">
           <h4>&#128279; Linked Service</h4>
@@ -1069,7 +1069,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
 
       <div class="code-block">
         <div class="code-header">
-          <span class="code-lang">JSON — ADF Pipeline Definition</span>
+          <span class="code-lang">JSON - ADF Pipeline Definition</span>
           <button class="copy-btn" onclick="copyCode(this)">Copy</button>
         </div>
         <pre><code>{
@@ -1108,7 +1108,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
 
       <!-- QUIZ 8.1 -->
       <div class="quiz-box" id="quiz81">
-        <div class="quiz-title">&#129504; Quiz 8.1 &mdash; Azure Data Factory</div>
+        <div class="quiz-title">&#129504; Quiz 8.1  -  Azure Data Factory</div>
         <div class="quiz-q" id="q81_1">
           <div class="quiz-q-text">1. What ADF component stores the connection credentials for a data source?</div>
           <div class="quiz-options">
@@ -1146,7 +1146,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
       <div class="section-title">
         <span class="badge">8.2</span> Azure Databricks
       </div>
-      <div class="section-subtitle">Managed Apache Spark platform — notebooks, jobs, and production workloads</div>
+      <div class="section-subtitle">Managed Apache Spark platform - notebooks, jobs, and production workloads</div>
       <div class="divider"></div>
 
       <div class="card">
@@ -1180,7 +1180,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
           <tbody>
             <tr><td>Use case</td><td>Interactive development, notebooks</td><td>Automated production jobs</td></tr>
             <tr><td>Lifecycle</td><td>Started/stopped manually (or auto-terminate)</td><td>Created for each job run, deleted after</td></tr>
-            <tr><td>Cost</td><td>Higher (kept running for dev)</td><td>Lower (ephemeral — only exists during run)</td></tr>
+            <tr><td>Cost</td><td>Higher (kept running for dev)</td><td>Lower (ephemeral - only exists during run)</td></tr>
             <tr><td>Sharing</td><td>Multiple users can attach</td><td>Dedicated to one job run</td></tr>
             <tr><td>Best for</td><td>Exploration, debugging, ad hoc queries</td><td>Scheduled ETL, CI/CD pipelines</td></tr>
           </tbody>
@@ -1219,7 +1219,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
 
       <div class="code-block">
         <div class="code-header">
-          <span class="code-lang">JSON — Databricks Cluster Config</span>
+          <span class="code-lang">JSON - Databricks Cluster Config</span>
           <button class="copy-btn" onclick="copyCode(this)">Copy</button>
         </div>
         <pre><code>{
@@ -1244,7 +1244,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
 
       <!-- QUIZ 8.2 -->
       <div class="quiz-box" id="quiz82">
-        <div class="quiz-title">&#129504; Quiz 8.2 &mdash; Azure Databricks</div>
+        <div class="quiz-title">&#129504; Quiz 8.2  -  Azure Databricks</div>
         <div class="quiz-q" id="q82_1">
           <div class="quiz-q-text">1. Which cluster type should you use for a scheduled nightly ETL job to minimize cost?</div>
           <div class="quiz-options">
@@ -1282,14 +1282,14 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
       <div class="section-title">
         <span class="badge">8.3</span> Unity Catalog
       </div>
-      <div class="section-subtitle">Centralized data governance for all Databricks workspaces — permissions, lineage, and audit</div>
+      <div class="section-subtitle">Centralized data governance for all Databricks workspaces - permissions, lineage, and audit</div>
       <div class="divider"></div>
 
       <div class="card">
         <h3>&#128218; What is Unity Catalog?</h3>
         <p>Unity Catalog is Databricks' <strong>centralized governance layer</strong>. One catalog governs all workspaces in an Azure region. It provides:</p>
         <ul style="margin-top:8px;">
-          <li><strong>3-level namespace</strong>: <code>catalog.schema.table</code> — eliminates ambiguity across workspaces</li>
+          <li><strong>3-level namespace</strong>: <code>catalog.schema.table</code> - eliminates ambiguity across workspaces</li>
           <li><strong>Fine-grained permissions</strong>: grant access at catalog, schema, table, or column level</li>
           <li><strong>Column-level security</strong>: mask PII fields (SSN, email) for certain groups</li>
           <li><strong>Data lineage</strong>: automatic tracking of how data flows from source to consumption</li>
@@ -1336,7 +1336,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
 
       <div class="code-block">
         <div class="code-header">
-          <span class="code-lang">SQL — Unity Catalog Operations</span>
+          <span class="code-lang">SQL - Unity Catalog Operations</span>
           <button class="copy-btn" onclick="copyCode(this)">Copy</button>
         </div>
         <pre><code><span class="cm">-- Set active catalog and schema</span>
@@ -1363,7 +1363,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
 
       <!-- QUIZ 8.3 -->
       <div class="quiz-box" id="quiz83">
-        <div class="quiz-title">&#129504; Quiz 8.3 &mdash; Unity Catalog</div>
+        <div class="quiz-title">&#129504; Quiz 8.3  -  Unity Catalog</div>
         <div class="quiz-q" id="q83_1">
           <div class="quiz-q-text">1. What is the correct 3-level namespace format in Unity Catalog?</div>
           <div class="quiz-options">
@@ -1401,7 +1401,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
       <div class="section-title">
         <span class="badge">8.4</span> Delta Live Tables (DLT)
       </div>
-      <div class="section-subtitle">Declarative pipeline framework — define what you want, Databricks handles the rest</div>
+      <div class="section-subtitle">Declarative pipeline framework - define what you want, Databricks handles the rest</div>
       <div class="divider"></div>
 
       <div class="card">
@@ -1450,7 +1450,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
 
       <div class="code-block">
         <div class="code-header">
-          <span class="code-lang">Python — DLT Pipeline Definition</span>
+          <span class="code-lang">Python - DLT Pipeline Definition</span>
           <button class="copy-btn" onclick="copyCode(this)">Copy</button>
         </div>
         <pre><code><span class="kw">import</span> dlt
@@ -1503,7 +1503,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
 
       <!-- QUIZ 8.4 -->
       <div class="quiz-box" id="quiz84">
-        <div class="quiz-title">&#129504; Quiz 8.4 &mdash; Delta Live Tables</div>
+        <div class="quiz-title">&#129504; Quiz 8.4  -  Delta Live Tables</div>
         <div class="quiz-q" id="q84_1">
           <div class="quiz-q-text">1. What DLT expectation type would you use to drop rows that fail a quality check but keep the pipeline running?</div>
           <div class="quiz-options">
@@ -1554,7 +1554,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
           <p><strong>Use ADF when:</strong></p>
           <ul>
             <li>You need to move data between 100+ supported connectors (SAP, Salesforce, Oracle, S3, etc.)</li>
-            <li>Your transformations are simple (column mapping, type casting) — use Data Flow activities</li>
+            <li>Your transformations are simple (column mapping, type casting) - use Data Flow activities</li>
             <li>You need to orchestrate other services (trigger Databricks jobs, run stored procedures)</li>
             <li>You want a no-code/low-code visual pipeline builder</li>
             <li>You need built-in scheduling and monitoring with alerting</li>
@@ -1581,13 +1581,13 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
         <div class="accordion-body">
           <p>The key difference is <strong>Hierarchical Namespace (HNS)</strong>:</p>
           <ul>
-            <li><strong>Blob Storage</strong>: flat namespace — "directories" are just prefixes in blob names. Renaming a "folder" means copying every file then deleting originals — O(n) operation.</li>
-            <li><strong>ADLS Gen2</strong>: true directory structure. Rename/delete a directory is atomic O(1) — updates a single metadata pointer, regardless of how many files are inside.</li>
+            <li><strong>Blob Storage</strong>: flat namespace - "directories" are just prefixes in blob names. Renaming a "folder" means copying every file then deleting originals - O(n) operation.</li>
+            <li><strong>ADLS Gen2</strong>: true directory structure. Rename/delete a directory is atomic O(1) - updates a single metadata pointer, regardless of how many files are inside.</li>
             <li><strong>ACL Permissions</strong>: Blob only supports container-level RBAC. ADLS Gen2 supports Unix-style ACLs at file and folder level.</li>
             <li><strong>Analytics performance</strong>: ADLS Gen2 uses the ABFS driver optimized for Spark/Hadoop workloads. Significantly faster for large analytical queries.</li>
-            <li><strong>Hadoop compatibility</strong>: ADLS Gen2 implements the Hadoop Filesystem interface — Databricks and HDInsight work natively with it.</li>
+            <li><strong>Hadoop compatibility</strong>: ADLS Gen2 implements the Hadoop Filesystem interface - Databricks and HDInsight work natively with it.</li>
           </ul>
-          <p style="margin-top:8px;">For any data lake use case, always choose ADLS Gen2 (enable HNS when creating the storage account — it cannot be changed later).</p>
+          <p style="margin-top:8px;">For any data lake use case, always choose ADLS Gen2 (enable HNS when creating the storage account - it cannot be changed later).</p>
         </div>
       </div>
 
@@ -1601,14 +1601,14 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
         <div class="accordion-body">
           <p><strong>Service Principal:</strong></p>
           <ul>
-            <li>An app registration in Azure Entra ID — creates a client_id + client_secret</li>
+            <li>An app registration in Azure Entra ID - creates a client_id + client_secret</li>
             <li>You are responsible for creating, storing, and rotating secrets</li>
             <li>Can be used outside Azure (from on-premises or other clouds)</li>
             <li>Risk: secrets can be leaked if stored insecurely</li>
           </ul>
           <p style="margin-top:8px;"><strong>Managed Identity:</strong></p>
           <ul>
-            <li>Azure automatically creates and manages the identity — no secrets exist</li>
+            <li>Azure automatically creates and manages the identity - no secrets exist</li>
             <li><strong>System-assigned</strong>: tied to a specific Azure resource (deleted when resource is deleted)</li>
             <li><strong>User-assigned</strong>: standalone identity that can be attached to multiple resources</li>
             <li>Only works within Azure services</li>
@@ -1717,7 +1717,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
           </ul>
           <p style="margin-top:8px;"><strong>How it works:</strong></p>
           <ul>
-            <li>SHIR makes outbound HTTPS connections to Azure Service Bus — no inbound firewall rules needed</li>
+            <li>SHIR makes outbound HTTPS connections to Azure Service Bus - no inbound firewall rules needed</li>
             <li>ADF sends instructions via Service Bus; SHIR executes queries locally and sends results back</li>
             <li>Data flows: On-Premises DB → SHIR agent → Azure Service Bus → ADF → ADLS</li>
             <li>For HA: install SHIR on 2+ machines and configure as a cluster</li>
@@ -1737,7 +1737,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
           <ul>
             <li><strong>Schedule Trigger</strong>: Run at specific times using cron expressions (e.g., "0 2 * * *" = 2 AM daily). Simple and most common. Does not backfill missed runs.</li>
             <li><strong>Tumbling Window Trigger</strong>: Fixed-size, non-overlapping time windows starting from a defined start time. Supports backfill (re-processes historical windows). Use for: hourly/daily batches where you need to process one specific time window per run.</li>
-            <li><strong>Storage Event Trigger</strong>: Fires when a blob is created or deleted in ADLS/Blob Storage. Event-driven ingestion — process files as they land. Subscribe to specific container/folder patterns.</li>
+            <li><strong>Storage Event Trigger</strong>: Fires when a blob is created or deleted in ADLS/Blob Storage. Event-driven ingestion - process files as they land. Subscribe to specific container/folder patterns.</li>
             <li><strong>Custom Event Trigger</strong>: Fires based on events published to Azure Event Grid. Use for integration with external systems.</li>
             <li><strong>Manual / API Trigger</strong>: Triggered programmatically via REST API or ADF UI. Use for on-demand runs and testing.</li>
           </ul>
@@ -1754,7 +1754,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
         <div class="accordion-body">
           <ul>
             <li><strong>ADF Monitor tab</strong>: Built-in UI showing all pipeline runs, activity runs, trigger runs with status, duration, and error messages. Filter by status (Failed), date range, pipeline name.</li>
-            <li><strong>Azure Monitor Alerts</strong>: Create metric alerts on "Failed pipeline runs" — triggers email/SMS/webhook/Teams notification when count &gt; 0.</li>
+            <li><strong>Azure Monitor Alerts</strong>: Create metric alerts on "Failed pipeline runs" - triggers email/SMS/webhook/Teams notification when count &gt; 0.</li>
             <li><strong>Diagnostic Logs to Log Analytics</strong>: Enable diagnostic settings to send ADF logs to Azure Log Analytics. Then query with KQL: <code>ADFPipelineRun | where Status == 'Failed'</code></li>
             <li><strong>Web Activity for custom notifications</strong>: Add a Web activity in the pipeline's Failure path to call a Teams webhook, PagerDuty, or Slack API with failure details.</li>
             <li><strong>Azure Data Factory failure email</strong>: Configure built-in failure notifications in ADF &gt; Manage &gt; Alerts &amp; Metrics.</li>
@@ -1781,7 +1781,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
           <p style="margin-top:8px;"><strong>Data Analyst:</strong></p>
           <ul>
             <li><strong>Storage Blob Data Reader</strong> on specific containers (read-only)</li>
-            <li>Databricks workspace access (but no cluster creation — use SQL Warehouse)</li>
+            <li>Databricks workspace access (but no cluster creation - use SQL Warehouse)</li>
             <li>Unity Catalog: GRANT SELECT ON SCHEMA gold (read-only access to gold layer)</li>
             <li>No ADF access needed (they don't build pipelines)</li>
           </ul>
@@ -1799,7 +1799,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
         <div class="accordion-body">
           <ul>
             <li><strong>Automatic dependency management</strong>: In notebooks, you manually order cells/notebooks. In DLT, you reference tables by name and DLT builds the DAG automatically.</li>
-            <li><strong>Built-in data quality</strong>: @dlt.expect annotations enforce quality rules — no need to manually write quality check code.</li>
+            <li><strong>Built-in data quality</strong>: @dlt.expect annotations enforce quality rules - no need to manually write quality check code.</li>
             <li><strong>Automatic incremental processing</strong>: DLT tracks what has been processed. On re-run, only new data is processed. With notebooks, you must manage this yourself (watermarks, checkpoints).</li>
             <li><strong>Auto-retry and error recovery</strong>: DLT automatically retries failed tasks. Notebooks fail and require manual re-run.</li>
             <li><strong>Monitoring UI</strong>: DLT provides a visual pipeline graph with row counts, quality metrics, and data quality trends per run. Notebooks have no built-in pipeline monitoring.</li>
@@ -1840,7 +1840,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
           <p><strong>All-purpose Cluster:</strong></p>
           <ul>
             <li>Started manually or via auto-start when attaching a notebook</li>
-            <li>Persists between runs — stays alive until manually stopped or auto-termination kicks in</li>
+            <li>Persists between runs - stays alive until manually stopped or auto-termination kicks in</li>
             <li>Multiple users and notebooks can attach simultaneously</li>
             <li>Billed at "all-purpose compute" DBU rate (more expensive)</li>
             <li>Best for: interactive development, exploratory analysis, debugging</li>
@@ -1848,9 +1848,9 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
           <p style="margin-top:8px;"><strong>Job Cluster:</strong></p>
           <ul>
             <li>Created automatically when a job run starts, destroyed when the run completes</li>
-            <li>Dedicated to exactly one job run — no sharing</li>
+            <li>Dedicated to exactly one job run - no sharing</li>
             <li>Billed at "jobs compute" DBU rate (cheaper, typically 30-50% less than all-purpose)</li>
-            <li>Completely isolated — no interference from other users/notebooks</li>
+            <li>Completely isolated - no interference from other users/notebooks</li>
             <li>Best for: production ETL jobs, scheduled pipelines, CI/CD</li>
           </ul>
           <p style="margin-top:8px;"><strong>Rule of thumb</strong>: Develop on all-purpose, ship to production on job clusters. Never run production workloads on all-purpose clusters.</p>
@@ -1884,7 +1884,7 @@ result = subprocess.<span class="fn">run</span>([<span class="str">"az"</span>, 
           <ul>
             <li>ADF ingests CDC events to Bronze Delta table</li>
             <li>DLT uses APPLY CHANGES INTO to automatically handle inserts/updates/deletes using sequence keys</li>
-            <li>Most elegant solution — DLT manages the merge logic automatically</li>
+            <li>Most elegant solution - DLT manages the merge logic automatically</li>
           </ul>
         </div>
       </div>
@@ -2075,7 +2075,7 @@ try {
   });
 } catch(e) {}
 
-// =================== ANIMATION 7.1 — HIERARCHY ===================
+// =================== ANIMATION 7.1 - HIERARCHY ===================
 let hierTimer = null;
 function startHierAnim() {
   clearTimeout(hierTimer);
@@ -2094,7 +2094,7 @@ function startHierAnim() {
 }
 startHierAnim();
 
-// =================== ANIMATION 7.2 — STORAGE TREE ===================
+// =================== ANIMATION 7.2 - STORAGE TREE ===================
 let storageTimer = null;
 function openFolder(folderId, childrenId) {
   const folder = document.getElementById(folderId);
@@ -2128,7 +2128,7 @@ function startStorageAnim() {
 }
 startStorageAnim();
 
-// =================== ANIMATION 7.3 — PERMISSIONS ===================
+// =================== ANIMATION 7.3 - PERMISSIONS ===================
 let permTimer = null;
 let permIdx = 0;
 const permNodes = ['pn0','pn1','pn2','pn3','pn4','pn5','pn6'];
@@ -2150,7 +2150,7 @@ function startPermAnim() {
 }
 startPermAnim();
 
-// =================== ANIMATION 7.4 — SEQUENCE DIAGRAM ===================
+// =================== ANIMATION 7.4 - SEQUENCE DIAGRAM ===================
 let seqTimer = null;
 function animateSeqStep(stepId, delay) {
   setTimeout(() => {
@@ -2180,7 +2180,7 @@ function startSeqAnim() {
 }
 startSeqAnim();
 
-// =================== ANIMATION 8.1 — PIPELINE ===================
+// =================== ANIMATION 8.1 - PIPELINE ===================
 let pipeTimer = null;
 function startPipelineAnim() {
   clearTimeout(pipeTimer);
@@ -2205,7 +2205,7 @@ function startPipelineAnim() {
 }
 startPipelineAnim();
 
-// =================== ANIMATION 8.2 — DEV STAGES ===================
+// =================== ANIMATION 8.2 - DEV STAGES ===================
 let devTimer = null;
 setInterval(() => {
   const c = document.getElementById('blinkCursor');
@@ -2233,7 +2233,7 @@ function startDevAnim() {
 }
 startDevAnim();
 
-// =================== ANIMATION 8.3 — LINEAGE ===================
+// =================== ANIMATION 8.3 - LINEAGE ===================
 let lineageTimer = null;
 let lineageIdx = 0;
 const lineageNodes = ['ln0','ln1','ln2','ln3','ln4','ln5','ln6'];
@@ -2254,7 +2254,7 @@ function startLineageAnim() {
 }
 startLineageAnim();
 
-// =================== ANIMATION 8.4 — MEDALLION ===================
+// =================== ANIMATION 8.4 - MEDALLION ===================
 let medalTimer = null;
 function countUp(el, target, duration, suffix) {
   let val = 0;
