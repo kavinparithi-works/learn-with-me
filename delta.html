@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spark Optimization + Delta Lake | LearnWithMe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<style>
+:root {
+  --orange: #f97316;
+  --orange-light: #fed7aa;
+  --orange-dark: #ea580c;
+  --bg: #fafaf9;
+  --bg-card: #ffffff;
+  --text: #1c1917;
+  --text-muted: #78716c;
+  --border: #e7e5e2;
+  --sidebar-width: 260px;
+  --topbar-height: 60px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+h1,h2,h3,h4,h5,h6{font-family:'Space Grotesk',sans-serif;}
+code,pre,kbd{font-family:'JetBrains Mono',monospace;}
+
+/* TOPBAR */
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-height);background:var(--bg-card);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;z-index:100;gap:24px;}
+.topbar-logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.2rem;color:var(--orange);text-decoration:none;white-space:nowrap;}
+.topbar-nav{display:flex;gap:4px;align-items:center;flex:1;}
+.topbar-nav a{font-size:0.85rem;font-weight:500;color:var(--text-muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:all 0.2s;}
+.topbar-nav a:hover{color:var(--text);background:var(--bg);}
+.topbar-nav a.active{color:var(--orange);background:rgba(249,115,22,0.1);}
+.topbar-auth{margin-left:auto;}
+.btn-auth{background:var(--orange);color:#fff;border:none;padding:7px 16px;border-radius:8px;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s;}
+.btn-auth:hover{background:var(--orange-dark);}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:var(--topbar-height);left:0;width:var(--sidebar-width);height:calc(100vh - var(--topbar-height));overflow-y:auto;background:var(--bg-card);border-right:1px solid var(--border);padding:20px 0;z-index:90;}
+.sidebar-section-title{font-family:'Space Grotesk',sans-serif;font-size:0.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;padding:12px 20px 6px;}
+.sidebar-item{display:block;padding:7px 20px;font-size:0.85rem;color:var(--text-muted);text-decoration:none;transition:all 0.15s;cursor:pointer;border-left:2px solid transparent;}
+.sidebar-item:hover{color:var(--text);background:rgba(249,115,22,0.05);border-left-color:var(--orange-light);}
+.sidebar-item.active{color:var(--orange);background:rgba(249,115,22,0.08);border-left-color:var(--orange);font-weight:500;}
+
+/* MAIN */
+.main{margin-left:var(--sidebar-width);margin-top:var(--topbar-height);padding:0 0 60px 0;}
+
+/* CHAPTER HEADER */
+.chapter-header{background:linear-gradient(135deg,#f97316 0%,#ea580c 40%,#c2410c 100%);padding:60px 48px;color:#fff;}
+.chapter-header-eyebrow{font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;opacity:0.85;margin-bottom:10px;}
+.chapter-header h1{font-size:2.4rem;font-weight:700;margin-bottom:10px;}
+.chapter-header p{font-size:1.05rem;opacity:0.9;}
+
+/* SECTION */
+.section{padding:48px;}
+.section-title{font-size:1.5rem;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.section-num{background:var(--orange);color:#fff;font-size:0.75rem;font-weight:700;padding:3px 8px;border-radius:5px;}
+.section-desc{color:var(--text-muted);margin-bottom:28px;font-size:0.95rem;line-height:1.6;}
+.section-divider{border:none;border-top:1px solid var(--border);margin:48px 0;}
+
+/* CARDS */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.card-grid{display:grid;gap:16px;margin-bottom:28px;}
+.card-grid-2{grid-template-columns:repeat(2,1fr);}
+.card-grid-4{grid-template-columns:repeat(4,1fr);}
+.card h4{font-size:0.9rem;font-weight:600;margin-bottom:6px;color:var(--orange-dark);}
+.card p{font-size:0.85rem;color:var(--text-muted);line-height:1.5;}
+
+/* COMPARISON TABLE */
+.compare-table{width:100%;border-collapse:collapse;margin-bottom:28px;font-size:0.88rem;}
+.compare-table th{background:var(--orange);color:#fff;padding:10px 14px;text-align:left;font-family:'Space Grotesk',sans-serif;font-weight:600;}
+.compare-table th:first-child{border-radius:8px 0 0 0;}
+.compare-table th:last-child{border-radius:0 8px 0 0;}
+.compare-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;}
+.compare-table tr:nth-child(even) td{background:rgba(249,115,22,0.03);}
+.compare-table tr:last-child td{border-bottom:none;}
+
+/* INFO BOXES */
+.info-box{border-radius:10px;padding:16px 18px;margin-bottom:20px;font-size:0.88rem;line-height:1.6;display:flex;gap:12px;align-items:flex-start;}
+.info-box.tip{background:#fef3c7;border:1px solid #fde68a;color:#92400e;}
+.info-box.warning{background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;}
+.info-box .info-icon{font-size:1rem;flex-shrink:0;margin-top:1px;}
+
+/* CODE BLOCKS */
+.code-wrap{position:relative;margin-bottom:28px;border-radius:10px;overflow:hidden;}
+.code-label{background:#2a2a3e;color:#a0a0b8;font-size:0.72rem;font-weight:600;padding:7px 14px;text-transform:uppercase;letter-spacing:0.06em;display:flex;justify-content:space-between;align-items:center;}
+.copy-btn{background:rgba(249,115,22,0.15);color:#f97316;border:1px solid rgba(249,115,22,0.3);border-radius:5px;padding:3px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all 0.2s;}
+.copy-btn:hover{background:rgba(249,115,22,0.3);}
+.copy-btn.copied{background:rgba(34,197,94,0.15);color:#16a34a;border-color:rgba(34,197,94,0.3);}
+pre.code-block{background:#1e1e2e;padding:20px;overflow-x:auto;font-size:0.82rem;line-height:1.7;margin:0;counter-reset:line;}
+pre.code-block code{color:#cdd6f4;}
+.kw{color:#f97316;}
+.kw2{color:#cba6f7;}
+.str{color:#a6e3a1;}
+.cm{color:#6c7086;font-style:italic;}
+.fn{color:#89b4fa;}
+.num{color:#fab387;}
+.op{color:#89dceb;}
+
+/* ANIMATIONS */
+.anim-container{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:28px;overflow:hidden;}
+.anim-title{font-family:'Space Grotesk',sans-serif;font-size:0.9rem;font-weight:600;margin-bottom:16px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;}
+.anim-play-btn{background:var(--orange);color:#fff;border:none;padding:8px 18px;border-radius:7px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-top:12px;transition:background 0.2s;}
+.anim-play-btn:hover{background:var(--orange-dark);}
+
+/* PARTITION ANIMATION */
+.partition-anim{display:flex;gap:24px;align-items:flex-start;}
+.partition-side{flex:1;text-align:center;}
+.partition-side h5{font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.05em;}
+.executor-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.executor-box{background:#f1f5f9;border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;}
+.executor-label{font-size:0.7rem;font-weight:700;color:var(--text-muted);margin-bottom:6px;}
+.executor-bar-wrap{background:#e2e8f0;border-radius:4px;height:12px;overflow:hidden;}
+.executor-bar{height:100%;background:var(--orange);border-radius:4px;transition:width 0.8s ease;}
+.executor-pct{font-size:0.7rem;color:var(--text-muted);margin-top:4px;font-weight:600;}
+.partition-arrow{display:flex;align-items:center;font-size:1.4rem;color:var(--orange);margin-top:40px;}
+
+@keyframes packetMove{0%{transform:translate(0,0);opacity:1;}100%{transform:translate(var(--tx),var(--ty));opacity:0;}}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,0);}50%{box-shadow:0 0 0 6px rgba(249,115,22,0.25);}}
+@keyframes slideInRight{from{transform:translateX(30px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes barGrow{from{width:0;}to{width:var(--target-w);}}
+@keyframes filesMerge{0%{transform:scale(1) translate(0,0);opacity:1;}60%{transform:scale(0.3) translate(var(--mx),var(--my));opacity:0.5;}100%{transform:scale(0) translate(var(--mx),var(--my));opacity:0;}}
+@keyframes fileBig{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+@keyframes nodeAppear{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+@keyframes boxGlow{0%,100%{background:#f1f5f9;border-color:var(--border);}50%{background:rgba(249,115,22,0.1);border-color:var(--orange);}}
+@keyframes rowSlideIn{from{transform:translateX(40px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@keyframes rowFade{from{opacity:1;}to{opacity:0;transform:translateX(-20px);}}
+@keyframes arrowFlow{0%{opacity:0;transform:translateX(-10px);}50%{opacity:1;}100%{opacity:0;transform:translateX(10px);}}
+
+/* SHUFFLE ANIMATION */
+.shuffle-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.shuffle-exec{background:#f1f5f9;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;position:relative;overflow:visible;}
+.shuffle-exec-label{font-size:0.75rem;font-weight:700;color:var(--text-muted);}
+.packet{position:absolute;width:8px;height:8px;border-radius:50%;opacity:0;}
+.shuffle-stats{margin-top:16px;display:flex;gap:16px;justify-content:center;}
+.stat-badge{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 14px;text-align:center;}
+.stat-badge .val{font-size:1.1rem;font-weight:700;font-family:'Space Grotesk',sans-serif;}
+.stat-badge .lbl{font-size:0.7rem;color:var(--text-muted);}
+.stat-badge.bad .val{color:#dc2626;}
+.stat-badge.good .val{color:#16a34a;}
+
+/* CACHE ANIMATION */
+.cache-anim{display:flex;flex-direction:column;gap:20px;}
+.timeline-row{display:flex;gap:0;align-items:center;}
+.timeline-label{width:140px;font-size:0.78rem;font-weight:600;flex-shrink:0;color:var(--text-muted);}
+.timeline-steps{display:flex;gap:3px;flex:1;align-items:center;}
+.timeline-step{border-radius:4px;height:28px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:600;color:#fff;white-space:nowrap;padding:0 6px;opacity:0.2;transition:opacity 0.4s;}
+.timeline-step.active{opacity:1;}
+.step-read{background:#dc2626;}
+.step-filter{background:#f97316;}
+.step-join{background:#dc2626;}
+.step-agg{background:#f97316;}
+.step-hit{background:#16a34a;}
+.timeline-total{margin-left:12px;font-size:0.78rem;font-weight:700;}
+
+/* CATALYST ANIMATION */
+.catalyst-flow{display:flex;gap:0;align-items:center;overflow-x:auto;padding:8px 0;}
+.catalyst-box{background:#f1f5f9;border:2px solid var(--border);border-radius:10px;padding:14px 12px;text-align:center;min-width:130px;flex-shrink:0;transition:all 0.4s;}
+.catalyst-box.glow{background:rgba(249,115,22,0.1);border-color:var(--orange);box-shadow:0 0 0 4px rgba(249,115,22,0.15);}
+.catalyst-box .cb-num{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--orange);margin-bottom:4px;}
+.catalyst-box .cb-title{font-size:0.82rem;font-weight:700;margin-bottom:4px;}
+.catalyst-box .cb-desc{font-size:0.68rem;color:var(--text-muted);line-height:1.4;}
+.catalyst-arrow{font-size:1.2rem;color:var(--text-muted);padding:0 6px;flex-shrink:0;}
+
+/* VERSION TIMELINE */
+.version-timeline{position:relative;padding:20px 0;overflow-x:auto;}
+.version-line{height:3px;background:linear-gradient(90deg,var(--orange-light),var(--orange));position:absolute;top:50px;left:20px;right:20px;}
+.version-nodes{display:flex;gap:0;justify-content:space-between;position:relative;z-index:1;}
+.version-node{text-align:center;flex:1;cursor:pointer;position:relative;}
+.version-dot{width:16px;height:16px;border-radius:50%;background:var(--orange);border:3px solid #fff;box-shadow:0 0 0 2px var(--orange);margin:0 auto 10px;opacity:0;transform:scale(0);transition:all 0.4s;}
+.version-dot.current{background:#fff;border-color:var(--orange);box-shadow:0 0 0 3px var(--orange);}
+.version-dot.visible{opacity:1;transform:scale(1);}
+.version-label{font-size:0.68rem;font-weight:700;color:var(--text);}
+.version-date{font-size:0.62rem;color:var(--text-muted);}
+.version-op{font-size:0.72rem;color:var(--orange);font-weight:600;margin-top:2px;}
+.version-tooltip{display:none;position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);background:#1e1e2e;color:#cdd6f4;font-size:0.72rem;padding:8px 12px;border-radius:7px;white-space:nowrap;z-index:10;pointer-events:none;}
+.version-node:hover .version-tooltip{display:block;}
+
+/* MERGE ANIMATION */
+.merge-anim{display:flex;gap:20px;align-items:flex-start;}
+.merge-side{flex:1;}
+.merge-side h5{font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:10px;text-align:center;}
+.merge-record{padding:8px 12px;border-radius:7px;font-size:0.78rem;font-weight:600;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;border:1px solid transparent;}
+.mr-source{background:#eff6ff;border-color:#bfdbfe;color:#1e40af;}
+.mr-target{background:#f0fdf4;border-color:#bbf7d0;color:#166534;}
+.mr-new{background:#fff7ed;border-color:#fed7aa;color:#9a3412;}
+.mr-del{background:#fef2f2;border-color:#fecaca;color:#991b1b;}
+.merge-arrows{display:flex;flex-direction:column;justify-content:center;gap:10px;align-items:center;padding-top:22px;}
+.merge-arrow{padding:4px 10px;border-radius:6px;font-size:0.65rem;font-weight:700;text-align:center;opacity:0;animation:fadeIn 0.4s ease forwards;}
+.ma-update{background:#fed7aa;color:#9a3412;}
+.ma-insert{background:#bbf7d0;color:#166534;}
+.ma-delete{background:#fecaca;color:#991b1b;}
+
+/* FILE COMPACTION ANIMATION */
+.compact-anim{display:flex;gap:24px;align-items:center;justify-content:center;padding:10px 0;}
+.compact-side{display:flex;flex-wrap:wrap;gap:5px;width:180px;justify-content:center;}
+.small-file{width:22px;height:28px;background:linear-gradient(135deg,#fed7aa,#f97316);border-radius:3px;opacity:0.8;transition:all 0.5s;display:flex;align-items:center;justify-content:center;font-size:0.45rem;font-weight:700;color:#fff;}
+.large-file{width:70px;height:80px;background:linear-gradient(135deg,#f97316,#ea580c);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.62rem;font-weight:700;color:#fff;text-align:center;transform:scale(0);transition:all 0.6s;}
+.compact-arrow{font-size:1rem;color:var(--text-muted);text-align:center;}
+.compact-arrow .ca-label{font-size:0.7rem;font-weight:700;color:var(--orange);display:block;margin-top:4px;}
+.compact-stats{text-align:center;margin-top:10px;font-size:0.78rem;font-weight:600;color:var(--text-muted);}
+.large-files-side{display:flex;gap:10px;justify-content:center;}
+
+/* QUIZ */
+.quiz-box{background:linear-gradient(135deg,rgba(249,115,22,0.05),rgba(249,115,22,0.02));border:1px solid var(--orange-light);border-radius:12px;padding:24px;margin-top:28px;}
+.quiz-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.quiz-title{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;}
+.quiz-progress{font-size:0.78rem;color:var(--text-muted);}
+.quiz-q{margin-bottom:16px;}
+.quiz-q-text{font-size:0.92rem;font-weight:600;margin-bottom:12px;}
+.quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.quiz-opt{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:0.83rem;cursor:pointer;text-align:left;font-family:'Inter',sans-serif;transition:all 0.2s;color:var(--text);}
+.quiz-opt:hover:not(:disabled){background:rgba(249,115,22,0.06);border-color:var(--orange-light);}
+.quiz-opt.correct{background:#dcfce7;border-color:#86efac;color:#166534;font-weight:600;}
+.quiz-opt.wrong{background:#fee2e2;border-color:#fca5a5;color:#991b1b;}
+.quiz-opt:disabled{cursor:default;}
+.quiz-explanation{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:0.82rem;color:var(--text-muted);line-height:1.5;margin-top:10px;display:none;}
+.quiz-next-btn{background:var(--orange);color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:0.83rem;font-weight:600;cursor:pointer;margin-top:12px;font-family:'Inter',sans-serif;display:none;transition:background 0.2s;}
+.quiz-next-btn:hover{background:var(--orange-dark);}
+.quiz-score{text-align:center;padding:20px;display:none;}
+.quiz-score .score-val{font-size:2.5rem;font-weight:700;font-family:'Space Grotesk',sans-serif;color:var(--orange);}
+.quiz-score p{color:var(--text-muted);font-size:0.88rem;margin-top:6px;}
+.quiz-retry-btn{background:var(--orange);color:#fff;border:none;padding:8px 20px;border-radius:8px;font-size:0.83rem;font-weight:600;cursor:pointer;margin-top:12px;font-family:'Inter',sans-serif;}
+
+/* INTERVIEW QUESTIONS */
+.iq-item{border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+.iq-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;cursor:pointer;background:var(--bg-card);transition:background 0.15s;}
+.iq-header:hover{background:rgba(249,115,22,0.04);}
+.iq-q{font-size:0.88rem;font-weight:600;flex:1;}
+.iq-badges{display:flex;gap:8px;align-items:center;flex-shrink:0;margin-left:12px;}
+.badge{font-size:0.65rem;font-weight:700;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.05em;}
+.badge-easy{background:#dcfce7;color:#166534;}
+.badge-medium{background:#fef3c7;color:#92400e;}
+.badge-hard{background:#fee2e2;color:#991b1b;}
+.iq-toggle{font-size:1rem;color:var(--text-muted);transition:transform 0.2s;}
+.iq-body{display:none;padding:16px 18px;border-top:1px solid var(--border);background:#fafaf9;font-size:0.86rem;line-height:1.65;color:var(--text-muted);}
+.iq-body strong{color:var(--text);}
+.iq-item.open .iq-toggle{transform:rotate(180deg);}
+.iq-item.open .iq-body{display:block;}
+
+/* BOTTOM NAV */
+.bottom-nav{display:flex;justify-content:space-between;align-items:center;padding:32px 48px;border-top:1px solid var(--border);background:var(--bg-card);}
+.btn-nav{display:flex;align-items:center;gap:8px;padding:11px 22px;border-radius:9px;font-size:0.88rem;font-weight:600;text-decoration:none;transition:all 0.2s;font-family:'Inter',sans-serif;}
+.btn-nav-prev{background:var(--bg);border:1px solid var(--border);color:var(--text-muted);}
+.btn-nav-prev:hover{border-color:var(--orange);color:var(--orange);}
+.btn-nav-next{background:var(--orange);color:#fff;border:1px solid var(--orange);}
+.btn-nav-next:hover{background:var(--orange-dark);border-color:var(--orange-dark);}
+
+/* AUTH MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:none;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--bg-card);border-radius:14px;padding:32px;width:360px;max-width:95vw;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.15);}
+.modal h2{font-size:1.3rem;margin-bottom:20px;}
+.modal-close{position:absolute;top:14px;right:14px;background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-muted);width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;}
+.modal-close:hover{background:var(--bg);}
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-size:0.8rem;font-weight:600;margin-bottom:5px;color:var(--text-muted);}
+.form-group input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);outline:none;transition:border-color 0.2s;}
+.form-group input:focus{border-color:var(--orange);}
+.btn-signin{width:100%;background:var(--orange);color:#fff;border:none;padding:11px;border-radius:8px;font-size:0.9rem;font-weight:600;cursor:pointer;margin-top:6px;font-family:'Inter',sans-serif;transition:background 0.2s;}
+.btn-signin:hover{background:var(--orange-dark);}
+.modal-footer{text-align:center;margin-top:14px;font-size:0.82rem;color:var(--text-muted);}
+.modal-footer a{color:var(--orange);text-decoration:none;font-weight:600;}
+#auth-error{color:#dc2626;font-size:0.78rem;margin-top:8px;display:none;}
+
+@media(max-width:900px){
+  .main{margin-left:0;}
+  .sidebar{display:none;}
+  .card-grid-4{grid-template-columns:1fr 1fr;}
+  .quiz-options{grid-template-columns:1fr;}
+  .partition-anim{flex-direction:column;}
+  .merge-anim{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <a href="/" class="topbar-logo">LearnWithMe</a>
+  <nav class="topbar-nav">
+    <a href="sql.html">SQL</a>
+    <a href="python.html">Python</a>
+    <a href="spark.html">Spark</a>
+    <a href="delta.html" class="active">Delta-Lake</a>
+    <a href="azure.html">Azure</a>
+    <a href="production.html">Production</a>
+    <a href="interview.html">Interview-Prep</a>
+  </nav>
+  <div class="topbar-auth">
+    <button class="btn-auth" id="authBtn" onclick="toggleAuth()">Sign In</button>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-section-title">Level 5: Spark Optimization</div>
+  <a class="sidebar-item" onclick="scrollTo51()">5.1 Partitions</a>
+  <a class="sidebar-item" onclick="scrollTo52()">5.2 Shuffles</a>
+  <a class="sidebar-item" onclick="scrollTo53()">5.3 Caching</a>
+  <a class="sidebar-item" onclick="scrollTo54()">5.4 Catalyst Optimizer</a>
+  <div class="sidebar-section-title" style="margin-top:12px;">Level 6: Delta Lake</div>
+  <a class="sidebar-item" onclick="scrollTo61()">6.1 Fundamentals</a>
+  <a class="sidebar-item" onclick="scrollTo62()">6.2 MERGE/Upsert</a>
+  <a class="sidebar-item" onclick="scrollTo63()">6.3 Optimization</a>
+  <div class="sidebar-section-title" style="margin-top:12px;">Practice</div>
+  <a class="sidebar-item" onclick="scrollToIQ()">Interview Questions</a>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- CHAPTER HEADER -->
+<div class="chapter-header">
+  <div class="chapter-header-eyebrow">Data Engineering Track</div>
+  <h1>Spark Optimization + Delta Lake</h1>
+  <p>Levels 5–6 &nbsp;·&nbsp; Master performance tuning and ACID-compliant data lakes</p>
+</div>
+
+<!-- ===== SECTION 5.1 PARTITIONS ===== -->
+<section class="section" id="s51">
+  <div class="section-title"><span class="section-num">5.1</span> Partitions</div>
+  <p class="section-desc">A partition = one chunk of data = one task for one executor. Understanding partitions is the foundation of Spark performance tuning.</p>
+
+  <div class="card-grid card-grid-4" style="margin-bottom:20px;">
+    <div class="card">
+      <h4>Default Partitions</h4>
+      <p>spark.sql.shuffle.partitions defaults to <strong>200</strong> after any shuffle operation.</p>
+    </div>
+    <div class="card">
+      <h4>Optimal Size</h4>
+      <p>Target <strong>128 MB</strong> per partition. Too small = overhead; too large = OOM risk.</p>
+    </div>
+    <div class="card">
+      <h4>repartition()</h4>
+      <p>Full shuffle. Can <strong>increase or decrease</strong> partitions. Even distribution guaranteed.</p>
+    </div>
+    <div class="card">
+      <h4>coalesce()</h4>
+      <p>No shuffle. Can only <strong>decrease</strong> partitions. Merges on same executor.</p>
+    </div>
+  </div>
+
+  <table class="compare-table">
+    <thead><tr><th>Feature</th><th>repartition()</th><th>coalesce()</th></tr></thead>
+    <tbody>
+      <tr><td>Shuffle</td><td>Yes (full shuffle)</td><td>No</td></tr>
+      <tr><td>Direction</td><td>Increase or decrease</td><td>Decrease only</td></tr>
+      <tr><td>Distribution</td><td>Even</td><td>May be uneven</td></tr>
+      <tr><td>Performance</td><td>Slower (network cost)</td><td>Faster</td></tr>
+      <tr><td>Use case</td><td>Before joins, after filter</td><td>Before write to reduce files</td></tr>
+    </tbody>
+  </table>
+
+  <!-- PARTITION ANIMATION -->
+  <div class="anim-container">
+    <div class="anim-title">Animation: Data Redistribution</div>
+    <div class="partition-anim">
+      <div class="partition-side">
+        <h5>Before (Skewed)</h5>
+        <div class="executor-grid" id="exec-before">
+          <div class="executor-box"><div class="executor-label">E1</div><div class="executor-bar-wrap"><div class="executor-bar" id="eb1" style="width:50%"></div></div><div class="executor-pct" id="ep1">50%</div></div>
+          <div class="executor-box"><div class="executor-label">E2</div><div class="executor-bar-wrap"><div class="executor-bar" id="eb2" style="width:10%"></div></div><div class="executor-pct" id="ep2">10%</div></div>
+          <div class="executor-box"><div class="executor-label">E3</div><div class="executor-bar-wrap"><div class="executor-bar" id="eb3" style="width:30%"></div></div><div class="executor-pct" id="ep3">30%</div></div>
+          <div class="executor-box"><div class="executor-label">E4</div><div class="executor-bar-wrap"><div class="executor-bar" id="eb4" style="width:10%"></div></div><div class="executor-pct" id="ep4">10%</div></div>
+        </div>
+      </div>
+      <div class="partition-arrow">→</div>
+      <div class="partition-side">
+        <h5>After repartition(4)</h5>
+        <div class="executor-grid" id="exec-after">
+          <div class="executor-box"><div class="executor-label">E1</div><div class="executor-bar-wrap"><div class="executor-bar" id="ea1" style="width:10%"></div></div><div class="executor-pct" id="ap1">10%</div></div>
+          <div class="executor-box"><div class="executor-label">E2</div><div class="executor-bar-wrap"><div class="executor-bar" id="ea2" style="width:10%"></div></div><div class="executor-pct" id="ap2">10%</div></div>
+          <div class="executor-box"><div class="executor-label">E3</div><div class="executor-bar-wrap"><div class="executor-bar" id="ea3" style="width:10%"></div></div><div class="executor-pct" id="ap3">10%</div></div>
+          <div class="executor-box"><div class="executor-label">E4</div><div class="executor-bar-wrap"><div class="executor-bar" id="ea4" style="width:10%"></div></div><div class="executor-pct" id="ap4">10%</div></div>
+        </div>
+      </div>
+    </div>
+    <button class="anim-play-btn" onclick="playPartitionAnim()">Play Animation</button>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span>Python — Partitions</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre class="code-block"><code><span class="cm"># Check current partitions</span>
+<span class="fn">print</span>(df.rdd.getNumPartitions())  <span class="cm"># e.g., 200</span>
+
+<span class="cm"># repartition - full shuffle, evenly distributes</span>
+df_repartitioned = df.<span class="fn">repartition</span>(<span class="num">8</span>)  <span class="cm"># increase for better parallelism</span>
+df_by_dept = df.<span class="fn">repartition</span>(<span class="num">4</span>, <span class="str">"department"</span>)  <span class="cm"># partition by column</span>
+
+<span class="cm"># coalesce - no shuffle, just merge partitions</span>
+df_coalesced = df.<span class="fn">coalesce</span>(<span class="num">1</span>)  <span class="cm"># reduce to 1 file for output (use carefully!)</span>
+
+<span class="cm"># Rule of thumb</span>
+<span class="cm"># - After filter: repartition (fewer rows, too many partitions)</span>
+<span class="cm"># - Before write: coalesce (avoid many small files)</span>
+<span class="cm"># - After join/groupBy: already repartitioned, check count</span>
+
+<span class="cm"># Set default shuffle partitions (tune per job size)</span>
+spark.conf.<span class="fn">set</span>(<span class="str">"spark.sql.shuffle.partitions"</span>, <span class="str">"50"</span>)  <span class="cm"># for small datasets</span>
+<span class="cm"># Default 200 good for 100GB+, reduce for smaller jobs</span></code></pre>
+  </div>
+
+  <!-- QUIZ 5.1 -->
+  <div class="quiz-box" id="quiz51">
+    <div class="quiz-header">
+      <div class="quiz-title">Quick Check — Partitions</div>
+      <div class="quiz-progress" id="qp51">Question 1 of 4</div>
+    </div>
+    <div id="quiz51-body"></div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 5.2 SHUFFLES ===== -->
+<section class="section" id="s52">
+  <div class="section-title"><span class="section-num">5.2</span> Shuffles</div>
+  <p class="section-desc">Shuffle = data moving across the network between executors. The most expensive Spark operation — minimize it wherever possible.</p>
+
+  <div class="card-grid card-grid-4" style="margin-bottom:20px;">
+    <div class="card">
+      <h4>Shuffle Triggers</h4>
+      <p>groupBy, orderBy, distinct, join (non-broadcast), repartition all cause shuffles.</p>
+    </div>
+    <div class="card">
+      <h4>Broadcast Join</h4>
+      <p>For small tables (&lt;10MB default). Sends small table to all executors, no shuffle needed.</p>
+    </div>
+    <div class="card">
+      <h4>Pre-Partitioning</h4>
+      <p>Repartition both DataFrames by join key before joining to avoid the join shuffle.</p>
+    </div>
+    <div class="card">
+      <h4>Bucketing</h4>
+      <p>Pre-sort and bucket on disk by key. Eliminates shuffle for repeated joins on same key.</p>
+    </div>
+  </div>
+
+  <!-- SHUFFLE ANIMATION -->
+  <div class="anim-container">
+    <div class="anim-title">Animation: Network Shuffle vs Broadcast</div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:200px;">
+        <div style="font-size:0.75rem;font-weight:700;text-align:center;color:#dc2626;margin-bottom:8px;">SHUFFLE JOIN</div>
+        <div class="shuffle-grid" id="shuffle-boxes">
+          <div class="shuffle-exec" id="se1"><div class="shuffle-exec-label">Executor 1</div></div>
+          <div class="shuffle-exec" id="se2"><div class="shuffle-exec-label">Executor 2</div></div>
+          <div class="shuffle-exec" id="se3"><div class="shuffle-exec-label">Executor 3</div></div>
+          <div class="shuffle-exec" id="se4"><div class="shuffle-exec-label">Executor 4</div></div>
+        </div>
+        <div class="shuffle-stats">
+          <div class="stat-badge bad"><div class="val" id="shuffle-io">8.2 GB</div><div class="lbl">Network I/O</div></div>
+          <div class="stat-badge bad"><div class="val" id="shuffle-time">8.2s</div><div class="lbl">Duration</div></div>
+        </div>
+      </div>
+      <div style="flex:1;min-width:200px;">
+        <div style="font-size:0.75rem;font-weight:700;text-align:center;color:#16a34a;margin-bottom:8px;">BROADCAST JOIN</div>
+        <div class="shuffle-grid" id="broadcast-boxes">
+          <div class="shuffle-exec" id="be1"><div class="shuffle-exec-label">Executor 1</div></div>
+          <div class="shuffle-exec" id="be2"><div class="shuffle-exec-label">Executor 2</div></div>
+          <div class="shuffle-exec" id="be3"><div class="shuffle-exec-label">Executor 3</div></div>
+          <div class="shuffle-exec" id="be4"><div class="shuffle-exec-label">Executor 4</div></div>
+        </div>
+        <div class="shuffle-stats">
+          <div class="stat-badge good"><div class="val" id="bcast-io">2.4 MB</div><div class="lbl">Network I/O</div></div>
+          <div class="stat-badge good"><div class="val" id="bcast-time">0.4s</div><div class="lbl">Duration</div></div>
+        </div>
+      </div>
+    </div>
+    <button class="anim-play-btn" onclick="playShuffleAnim()">Play Animation</button>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span>Python — Reduce Shuffle Cost</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre class="code-block"><code><span class="cm"># What triggers a shuffle</span>
+df.<span class="fn">groupBy</span>(<span class="str">"department"</span>).<span class="fn">count</span>()    <span class="cm"># SHUFFLE</span>
+df.<span class="fn">orderBy</span>(<span class="str">"salary"</span>)                <span class="cm"># SHUFFLE</span>
+df.<span class="fn">distinct</span>()                       <span class="cm"># SHUFFLE</span>
+df.<span class="fn">join</span>(other_df, <span class="str">"id"</span>)             <span class="cm"># SHUFFLE (unless broadcast)</span>
+
+<span class="cm"># Reducing shuffle cost</span>
+
+<span class="cm"># 1. Broadcast small tables (&lt; 10MB default, configurable)</span>
+<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> broadcast
+df.<span class="fn">join</span>(<span class="fn">broadcast</span>(small_df), <span class="str">"dept_id"</span>)
+
+<span class="cm"># 2. Pre-partition data before join</span>
+df1 = df1.<span class="fn">repartition</span>(<span class="str">"customer_id"</span>)
+df2 = df2.<span class="fn">repartition</span>(<span class="str">"customer_id"</span>)
+df1.<span class="fn">join</span>(df2, <span class="str">"customer_id"</span>)  <span class="cm"># no shuffle needed</span>
+
+<span class="cm"># 3. Increase broadcast threshold</span>
+spark.conf.<span class="fn">set</span>(<span class="str">"spark.sql.autoBroadcastJoinThreshold"</span>, <span class="str">"50m"</span>)  <span class="cm"># 50MB</span>
+
+<span class="cm"># 4. Use bucketing for repeated joins on same key</span>
+df.write.<span class="fn">bucketBy</span>(<span class="num">32</span>, <span class="str">"customer_id"</span>).<span class="fn">sortBy</span>(<span class="str">"customer_id"</span>).<span class="fn">saveAsTable</span>(<span class="str">"bucketed_customers"</span>)</code></pre>
+  </div>
+
+  <!-- QUIZ 5.2 -->
+  <div class="quiz-box" id="quiz52">
+    <div class="quiz-header">
+      <div class="quiz-title">Quick Check — Shuffles</div>
+      <div class="quiz-progress" id="qp52">Question 1 of 4</div>
+    </div>
+    <div id="quiz52-body"></div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 5.3 CACHING ===== -->
+<section class="section" id="s53">
+  <div class="section-title"><span class="section-num">5.3</span> Caching</div>
+  <p class="section-desc">Cache keeps a DataFrame in memory (or memory+disk) so repeated use avoids expensive recomputation from scratch.</p>
+
+  <div class="card-grid card-grid-4" style="margin-bottom:20px;">
+    <div class="card">
+      <h4>MEMORY_ONLY</h4>
+      <p>Fastest access. Stored as JVM objects. If OOM, partitions are recomputed, not spilled.</p>
+    </div>
+    <div class="card">
+      <h4>MEMORY_AND_DISK</h4>
+      <p>Default for cache(). Spills to disk if memory full. Reliable but slower for disk portions.</p>
+    </div>
+    <div class="card">
+      <h4>DISK_ONLY</h4>
+      <p>Always writes to disk. Slowest but always fits. Good for data larger than memory.</p>
+    </div>
+    <div class="card">
+      <h4>MEMORY_AND_DISK_2</h4>
+      <p>Replicated across 2 nodes. Fault-tolerant — no recompute on executor failure.</p>
+    </div>
+  </div>
+
+  <!-- CACHE ANIMATION -->
+  <div class="anim-container">
+    <div class="anim-title">Animation: Cache Performance Comparison</div>
+    <div class="cache-anim" id="cacheAnim">
+      <div class="timeline-row">
+        <div class="timeline-label">Run 1 (no cache)</div>
+        <div class="timeline-steps" id="ts1">
+          <div class="timeline-step step-read" id="ts1-1" style="width:100px;">Read (1.2s)</div>
+          <div class="timeline-step step-filter" id="ts1-2" style="width:80px;">Filter (0.8s)</div>
+          <div class="timeline-step step-join" id="ts1-3" style="width:150px;">Join (2.1s)</div>
+          <div class="timeline-step step-agg" id="ts1-4" style="width:80px;">Agg (0.9s)</div>
+        </div>
+        <div class="timeline-total" id="tt1" style="color:#dc2626;display:none;">5.0s total</div>
+      </div>
+      <div class="timeline-row">
+        <div class="timeline-label">Run 2 (with cache)</div>
+        <div class="timeline-steps" id="ts2">
+          <div class="timeline-step step-hit" id="ts2-1" style="width:20px;">Hit</div>
+          <div class="timeline-step step-join" id="ts2-2" style="width:150px;">Join (2.1s)</div>
+          <div class="timeline-step step-agg" id="ts2-3" style="width:80px;">Agg (0.9s)</div>
+        </div>
+        <div class="timeline-total" id="tt2" style="color:#16a34a;display:none;">3.1s — 38% faster</div>
+      </div>
+    </div>
+    <button class="anim-play-btn" onclick="playCacheAnim()">Play Animation</button>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span>Python — Caching Strategies</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre class="code-block"><code><span class="kw">from</span> pyspark <span class="kw">import</span> StorageLevel
+
+<span class="cm"># cache() = shortcut for MEMORY_AND_DISK</span>
+df_employees = spark.read.<span class="fn">parquet</span>(<span class="str">"/data/employees/"</span>)
+df_employees.<span class="fn">cache</span>()
+
+<span class="cm"># First action triggers caching</span>
+df_employees.<span class="fn">count</span>()  <span class="cm"># data loaded + cached</span>
+
+<span class="cm"># Subsequent actions use cache</span>
+df_employees.<span class="fn">filter</span>(<span class="fn">col</span>(<span class="str">"dept"</span>) == <span class="str">"Engineering"</span>).<span class="fn">show</span>()   <span class="cm"># fast</span>
+df_employees.<span class="fn">groupBy</span>(<span class="str">"dept"</span>).<span class="fn">count</span>().<span class="fn">show</span>()                <span class="cm"># fast</span>
+
+<span class="cm"># persist() with explicit storage level</span>
+df.<span class="fn">persist</span>(StorageLevel.MEMORY_ONLY)         <span class="cm"># fastest, may spill if OOM</span>
+df.<span class="fn">persist</span>(StorageLevel.MEMORY_AND_DISK)     <span class="cm"># cache() default</span>
+df.<span class="fn">persist</span>(StorageLevel.DISK_ONLY)           <span class="cm"># slowest, but always fits</span>
+df.<span class="fn">persist</span>(StorageLevel.MEMORY_AND_DISK_2)  <span class="cm"># replicated (fault tolerant)</span>
+
+<span class="cm"># When NOT to cache</span>
+<span class="cm"># - Single use (cache overhead not worth it)</span>
+<span class="cm"># - Larger than available memory (causes eviction churn)</span>
+<span class="cm"># - Infrequent access</span>
+
+<span class="cm"># Always unpersist when done to free memory</span>
+df_employees.<span class="fn">unpersist</span>()</code></pre>
+  </div>
+
+  <!-- QUIZ 5.3 -->
+  <div class="quiz-box" id="quiz53">
+    <div class="quiz-header">
+      <div class="quiz-title">Quick Check — Caching</div>
+      <div class="quiz-progress" id="qp53">Question 1 of 4</div>
+    </div>
+    <div id="quiz53-body"></div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 5.4 CATALYST OPTIMIZER ===== -->
+<section class="section" id="s54">
+  <div class="section-title"><span class="section-num">5.4</span> Catalyst Optimizer</div>
+  <p class="section-desc">Catalyst is Spark's automatic query optimizer. It transforms your logical plan into an efficient physical execution plan through 4 phases — without you doing anything.</p>
+
+  <!-- CATALYST ANIMATION -->
+  <div class="anim-container">
+    <div class="anim-title">Animation: Plan Transformation Pipeline</div>
+    <div class="catalyst-flow" id="catalystFlow">
+      <div class="catalyst-box" id="cb1">
+        <div class="cb-num">Phase 1</div>
+        <div class="cb-title">Parsed Logical Plan</div>
+        <div class="cb-desc">Raw SQL / DataFrame API resolved to unvalidated tree</div>
+      </div>
+      <div class="catalyst-arrow">→</div>
+      <div class="catalyst-box" id="cb2">
+        <div class="cb-num">Phase 2</div>
+        <div class="cb-title">Analyzed Logical Plan</div>
+        <div class="cb-desc">Column names resolved, schema validated, types checked</div>
+      </div>
+      <div class="catalyst-arrow">→</div>
+      <div class="catalyst-box" id="cb3">
+        <div class="cb-num">Phase 3</div>
+        <div class="cb-title">Optimized Logical Plan</div>
+        <div class="cb-desc">Predicate pushdown, column pruning, constant folding applied</div>
+      </div>
+      <div class="catalyst-arrow">→</div>
+      <div class="catalyst-box" id="cb4">
+        <div class="cb-num">Phase 4</div>
+        <div class="cb-title">Physical Plan + Code Gen</div>
+        <div class="cb-desc">Optimal join strategy selected, Tungsten JVM bytecode generated</div>
+      </div>
+    </div>
+    <button class="anim-play-btn" onclick="playCatalystAnim()">Play Animation</button>
+  </div>
+
+  <div class="card-grid card-grid-4" style="margin-bottom:20px;">
+    <div class="card">
+      <h4>Predicate Pushdown</h4>
+      <p>Filters moved as close to data source as possible. Parquet skips entire row groups.</p>
+    </div>
+    <div class="card">
+      <h4>Column Pruning</h4>
+      <p>Only reads columns actually used in the query. Parquet's columnar format makes this free.</p>
+    </div>
+    <div class="card">
+      <h4>Constant Folding</h4>
+      <p>Expressions like 1+1 evaluated once at compile time, not per row at runtime.</p>
+    </div>
+    <div class="card">
+      <h4>Tungsten Engine</h4>
+      <p>Generates optimized JVM bytecode. Operates on binary data directly, avoids serialization.</p>
+    </div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span>Python — Inspect Execution Plans</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre class="code-block"><code><span class="cm"># See the execution plan</span>
+df.<span class="fn">filter</span>(<span class="fn">col</span>(<span class="str">"salary"</span>) > <span class="num">80000</span>).<span class="fn">select</span>(<span class="str">"name"</span>, <span class="str">"salary"</span>).<span class="fn">explain</span>()
+
+<span class="cm"># Verbose plan with all 4 stages</span>
+df.<span class="fn">filter</span>(<span class="fn">col</span>(<span class="str">"salary"</span>) > <span class="num">80000</span>).<span class="fn">select</span>(<span class="str">"name"</span>, <span class="str">"salary"</span>).<span class="fn">explain</span>(<span class="kw">True</span>)
+
+<span class="cm"># Predicate pushdown - Catalyst pushes filter to data source</span>
+<span class="cm"># You write:</span>
+spark.read.<span class="fn">parquet</span>(<span class="str">"/data/employees/"</span>) \
+     .<span class="fn">filter</span>(<span class="fn">col</span>(<span class="str">"salary"</span>) > <span class="num">80000</span>)    <span class="cm"># filter AFTER read</span>
+
+<span class="cm"># Catalyst rewrites as:</span>
+<span class="cm"># Read parquet WITH filter applied at file level (skip entire row groups)</span>
+<span class="cm"># Result: reads far less data from disk</span>
+
+<span class="cm"># Column pruning - Catalyst only reads needed columns from Parquet</span>
+df.<span class="fn">select</span>(<span class="str">"name"</span>, <span class="str">"salary"</span>)  <span class="cm"># Parquet only reads 2 columns, not all 20</span></code></pre>
+  </div>
+
+  <!-- QUIZ 5.4 -->
+  <div class="quiz-box" id="quiz54">
+    <div class="quiz-header">
+      <div class="quiz-title">Quick Check — Catalyst Optimizer</div>
+      <div class="quiz-progress" id="qp54">Question 1 of 4</div>
+    </div>
+    <div id="quiz54-body"></div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 6.1 DELTA FUNDAMENTALS ===== -->
+<section class="section" id="s61">
+  <div class="section-title"><span class="section-num">6.1</span> Delta Lake Fundamentals</div>
+  <p class="section-desc">Delta Lake adds ACID transactions, schema enforcement, and time travel to Parquet files on your data lake — no separate database engine required.</p>
+
+  <div class="info-box tip">
+    <span class="info-icon">💡</span>
+    <span>Without Delta: Parquet has no transactions, no schema enforcement, no time travel, and no concurrent write protection. Delta's _delta_log/ transaction log solves all of these.</span>
+  </div>
+
+  <div class="card-grid card-grid-4" style="margin-bottom:20px;">
+    <div class="card">
+      <h4>Atomicity</h4>
+      <p>Writes fully succeed or fully fail. No partial writes that corrupt the table.</p>
+    </div>
+    <div class="card">
+      <h4>Consistency</h4>
+      <p>Schema enforced on every write. Constraints respected. Table always valid.</p>
+    </div>
+    <div class="card">
+      <h4>Isolation</h4>
+      <p>Concurrent writes use optimistic concurrency — don't corrupt each other.</p>
+    </div>
+    <div class="card">
+      <h4>Durability</h4>
+      <p>Committed data persists through failures via the transaction log on durable storage.</p>
+    </div>
+  </div>
+
+  <!-- VERSION TIMELINE ANIMATION -->
+  <div class="anim-container">
+    <div class="anim-title">Animation: Delta Version Timeline</div>
+    <div class="version-timeline">
+      <div class="version-line"></div>
+      <div class="version-nodes" id="versionNodes">
+        <div class="version-node">
+          <div class="version-dot" id="vd0"></div>
+          <div class="version-label">v0</div>
+          <div class="version-op">Table Created</div>
+          <div class="version-date">2024-01-01</div>
+          <div class="version-tooltip">CREATE TABLE employees<br>Schema defined, 0 rows</div>
+        </div>
+        <div class="version-node">
+          <div class="version-dot" id="vd1"></div>
+          <div class="version-label">v1</div>
+          <div class="version-op">INSERT 1000 rows</div>
+          <div class="version-date">2024-01-02</div>
+          <div class="version-tooltip">Initial data load<br>1,000 employee records</div>
+        </div>
+        <div class="version-node">
+          <div class="version-dot" id="vd2"></div>
+          <div class="version-label">v2</div>
+          <div class="version-op">UPDATE +10%</div>
+          <div class="version-date">2024-01-03</div>
+          <div class="version-tooltip">Annual salary increase<br>All records updated</div>
+        </div>
+        <div class="version-node">
+          <div class="version-dot" id="vd3"></div>
+          <div class="version-label">v3</div>
+          <div class="version-op">DELETE terminated</div>
+          <div class="version-date">2024-01-04</div>
+          <div class="version-tooltip">Removed 43 terminated<br>employee records</div>
+        </div>
+        <div class="version-node">
+          <div class="version-dot current" id="vd4"></div>
+          <div class="version-label">v4 ← current</div>
+          <div class="version-op">MERGE from CDC</div>
+          <div class="version-date">2024-01-05</div>
+          <div class="version-tooltip">CDC batch: 120 updates<br>18 inserts, 5 deletes</div>
+        </div>
+      </div>
+    </div>
+    <button class="anim-play-btn" onclick="playVersionAnim()">Play Animation</button>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span>Python — Delta Lake Basics</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre class="code-block"><code><span class="cm"># Write as Delta</span>
+df.write.<span class="fn">format</span>(<span class="str">"delta"</span>).<span class="fn">mode</span>(<span class="str">"overwrite"</span>).<span class="fn">save</span>(<span class="str">"/delta/employees/"</span>)
+
+<span class="cm"># Read Delta</span>
+df = spark.read.<span class="fn">format</span>(<span class="str">"delta"</span>).<span class="fn">load</span>(<span class="str">"/delta/employees/"</span>)
+
+<span class="cm"># Delta table history</span>
+spark.<span class="fn">sql</span>(<span class="str">"DESCRIBE HISTORY delta.`/delta/employees/`"</span>).<span class="fn">show</span>()
+
+<span class="cm"># Time travel - query previous version</span>
+df_v1 = spark.read.<span class="fn">format</span>(<span class="str">"delta"</span>) \
+              .<span class="fn">option</span>(<span class="str">"versionAsOf"</span>, <span class="num">1</span>) \
+              .<span class="fn">load</span>(<span class="str">"/delta/employees/"</span>)
+
+<span class="cm"># Time travel by timestamp</span>
+df_yesterday = spark.read.<span class="fn">format</span>(<span class="str">"delta"</span>) \
+                    .<span class="fn">option</span>(<span class="str">"timestampAsOf"</span>, <span class="str">"2024-01-02"</span>) \
+                    .<span class="fn">load</span>(<span class="str">"/delta/employees/"</span>)
+
+<span class="cm"># Schema enforcement (Delta rejects bad data)</span>
+<span class="cm"># This will FAIL if extra column not in schema:</span>
+bad_df.write.<span class="fn">format</span>(<span class="str">"delta"</span>).<span class="fn">mode</span>(<span class="str">"append"</span>).<span class="fn">save</span>(<span class="str">"/delta/employees/"</span>)
+<span class="cm"># DeltaAnalysisException: A schema mismatch detected</span>
+
+<span class="cm"># Schema evolution (opt-in to allow new columns)</span>
+new_df.write.<span class="fn">format</span>(<span class="str">"delta"</span>).<span class="fn">mode</span>(<span class="str">"append"</span>) \
+      .<span class="fn">option</span>(<span class="str">"mergeSchema"</span>, <span class="str">"true"</span>) \
+      .<span class="fn">save</span>(<span class="str">"/delta/employees/"</span>)</code></pre>
+  </div>
+
+  <!-- QUIZ 6.1 -->
+  <div class="quiz-box" id="quiz61">
+    <div class="quiz-header">
+      <div class="quiz-title">Quick Check — Delta Fundamentals</div>
+      <div class="quiz-progress" id="qp61">Question 1 of 5</div>
+    </div>
+    <div id="quiz61-body"></div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 6.2 MERGE ===== -->
+<section class="section" id="s62">
+  <div class="section-title"><span class="section-num">6.2</span> MERGE / Upsert</div>
+  <p class="section-desc">MERGE is the most important Delta operation. Update if a record exists, insert if it doesn't, delete if flagged — all atomically in one pass.</p>
+
+  <div class="card-grid card-grid-4" style="margin-bottom:20px;">
+    <div class="card">
+      <h4>whenMatchedUpdate</h4>
+      <p>Record exists in both source and target. Update target fields from source values.</p>
+    </div>
+    <div class="card">
+      <h4>whenNotMatchedInsert</h4>
+      <p>Record in source but NOT in target. Insert as a new row into the Delta table.</p>
+    </div>
+    <div class="card">
+      <h4>whenMatchedDelete</h4>
+      <p>Record exists in both but marked for deletion. Removes row from target table.</p>
+    </div>
+    <div class="card">
+      <h4>Use Cases</h4>
+      <p>Incremental loads, CDC processing, SCD Type 1, daily fact table updates.</p>
+    </div>
+  </div>
+
+  <!-- MERGE ANIMATION -->
+  <div class="anim-container">
+    <div class="anim-title">Animation: Record Lifecycle in MERGE</div>
+    <div class="merge-anim" id="mergeAnim">
+      <div class="merge-side">
+        <h5>Source Data</h5>
+        <div class="merge-record mr-source">id=1 <span>salary: $95k</span></div>
+        <div class="merge-record mr-source">id=2 <span>dept: Analytics</span></div>
+        <div class="merge-record mr-new">id=99 <span>NEW employee</span></div>
+        <div class="merge-record mr-del">id=5 <span>is_deleted: true</span></div>
+      </div>
+      <div class="merge-arrows" id="mergeArrows">
+        <div class="merge-arrow ma-update" style="animation-delay:0.5s;">MATCHED → UPDATE</div>
+        <div class="merge-arrow ma-update" style="animation-delay:1s;">MATCHED → UPDATE</div>
+        <div class="merge-arrow ma-insert" style="animation-delay:1.5s;">NOT MATCHED → INSERT</div>
+        <div class="merge-arrow ma-delete" style="animation-delay:2s;">MATCHED + deleted → DELETE</div>
+      </div>
+      <div class="merge-side">
+        <h5>Delta Table (After)</h5>
+        <div class="merge-record mr-target" id="mr-r1">id=1 <span>salary: $95k ✓</span></div>
+        <div class="merge-record mr-target" id="mr-r2">id=2 <span>dept: Analytics ✓</span></div>
+        <div class="merge-record mr-target" id="mr-r3">id=3 <span>unchanged</span></div>
+        <div class="merge-record mr-target" id="mr-r4">id=4 <span>unchanged</span></div>
+        <div class="merge-record mr-new" id="mr-r99" style="opacity:0;transition:opacity 0.6s;">id=99 <span>NEW ✓</span></div>
+      </div>
+    </div>
+    <button class="anim-play-btn" onclick="playMergeAnim()">Play Animation</button>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span>Python — MERGE (PySpark + SQL)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre class="code-block"><code><span class="cm"># MERGE in PySpark (Delta)</span>
+<span class="kw">from</span> delta.tables <span class="kw">import</span> DeltaTable
+
+target = DeltaTable.<span class="fn">forPath</span>(spark, <span class="str">"/delta/employees/"</span>)
+source_df = spark.read.<span class="fn">parquet</span>(<span class="str">"/staging/employees_updates/"</span>)
+
+target.<span class="fn">alias</span>(<span class="str">"target"</span>).<span class="fn">merge</span>(
+    source_df.<span class="fn">alias</span>(<span class="str">"source"</span>),
+    <span class="str">"target.id = source.id"</span>
+).<span class="fn">whenMatchedUpdate</span>(set={
+    <span class="str">"name"</span>:       <span class="str">"source.name"</span>,
+    <span class="str">"salary"</span>:     <span class="str">"source.salary"</span>,
+    <span class="str">"department"</span>: <span class="str">"source.department"</span>,
+    <span class="str">"updated_at"</span>: <span class="str">"source.updated_at"</span>
+}).<span class="fn">whenNotMatchedInsert</span>(values={
+    <span class="str">"id"</span>:         <span class="str">"source.id"</span>,
+    <span class="str">"name"</span>:       <span class="str">"source.name"</span>,
+    <span class="str">"salary"</span>:     <span class="str">"source.salary"</span>,
+    <span class="str">"department"</span>: <span class="str">"source.department"</span>,
+    <span class="str">"created_at"</span>: <span class="str">"source.created_at"</span>,
+    <span class="str">"updated_at"</span>: <span class="str">"source.updated_at"</span>
+}).<span class="fn">whenMatchedDelete</span>(
+    condition=<span class="str">"source.is_deleted = true"</span>
+).<span class="fn">execute</span>()
+
+<span class="cm"># SQL MERGE syntax</span>
+spark.<span class="fn">sql</span>(<span class="str">"""
+    MERGE INTO employees AS target
+    USING employees_updates AS source
+    ON target.id = source.id
+    WHEN MATCHED THEN
+        UPDATE SET target.salary = source.salary, target.department = source.department
+    WHEN NOT MATCHED THEN
+        INSERT (id, name, salary, department) VALUES (source.id, source.name, source.salary, source.department)
+    WHEN MATCHED AND source.is_deleted = true THEN
+        DELETE
+"""</span>)</code></pre>
+  </div>
+
+  <!-- QUIZ 6.2 -->
+  <div class="quiz-box" id="quiz62">
+    <div class="quiz-header">
+      <div class="quiz-title">Quick Check — MERGE / Upsert</div>
+      <div class="quiz-progress" id="qp62">Question 1 of 4</div>
+    </div>
+    <div id="quiz62-body"></div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 6.3 DELTA OPTIMIZATION ===== -->
+<section class="section" id="s63">
+  <div class="section-title"><span class="section-num">6.3</span> Delta Optimization</div>
+  <p class="section-desc">OPTIMIZE, VACUUM, and Z-ORDER keep Delta tables fast and storage-efficient. The small files problem is the #1 performance killer for streaming/incremental pipelines.</p>
+
+  <div class="info-box warning">
+    <span class="info-icon">⚠️</span>
+    <span>Small Files Problem: Every small append creates a new Parquet file. After 1000 daily loads, you have 1000 files for a simple scan. Each file requires a separate I/O operation and metadata read. OPTIMIZE fixes this.</span>
+  </div>
+
+  <!-- COMPACTION ANIMATION -->
+  <div class="anim-container">
+    <div class="anim-title">Animation: File Compaction (OPTIMIZE)</div>
+    <div class="compact-anim">
+      <div>
+        <div class="compact-side" id="smallFiles">
+          <div class="small-file">20M</div><div class="small-file">18M</div><div class="small-file">22M</div>
+          <div class="small-file">19M</div><div class="small-file">21M</div><div class="small-file">20M</div>
+          <div class="small-file">17M</div><div class="small-file">23M</div><div class="small-file">20M</div>
+          <div class="small-file">19M</div><div class="small-file">21M</div><div class="small-file">20M</div>
+        </div>
+        <div class="compact-stats" id="compactBefore">Before: 12 files × 20MB</div>
+      </div>
+      <div class="compact-arrow">
+        <div style="font-size:1.5rem;">→</div>
+        <span class="ca-label">OPTIMIZE</span>
+      </div>
+      <div>
+        <div class="large-files-side" id="largeFiles">
+          <div class="large-file" id="lf1">120MB<br>file</div>
+          <div class="large-file" id="lf2">120MB<br>file</div>
+        </div>
+        <div class="compact-stats" id="compactAfter" style="opacity:0;">After: 2 files × 120MB</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:8px;font-size:0.78rem;font-weight:600;color:#16a34a;" id="compactLabel"></div>
+    <button class="anim-play-btn" onclick="playCompactAnim()">Play Animation</button>
+  </div>
+
+  <div class="card-grid card-grid-4" style="margin-bottom:20px;">
+    <div class="card">
+      <h4>OPTIMIZE</h4>
+      <p>Compacts small Parquet files into larger ones (default 1GB target). Improves scan speed dramatically.</p>
+    </div>
+    <div class="card">
+      <h4>Z-ORDER</h4>
+      <p>Co-locates related data within files using a space-filling curve. Enable file skipping on filter columns.</p>
+    </div>
+    <div class="card">
+      <h4>VACUUM</h4>
+      <p>Deletes old Parquet files no longer in the transaction log. Default 7-day retention for time travel.</p>
+    </div>
+    <div class="card">
+      <h4>Auto Optimize</h4>
+      <p>Databricks feature: optimizeWrite and autoCompact automatically manage file sizes on write.</p>
+    </div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span>Python — OPTIMIZE, Z-ORDER, VACUUM</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre class="code-block"><code><span class="cm"># OPTIMIZE: compacts small files into larger ones</span>
+spark.<span class="fn">sql</span>(<span class="str">"OPTIMIZE delta.`/delta/employees/`"</span>)
+
+<span class="cm"># Z-ORDER: co-locate related data within files for faster filter queries</span>
+<span class="cm"># Best for high-cardinality filter columns</span>
+spark.<span class="fn">sql</span>(<span class="str">"OPTIMIZE delta.`/delta/employees/` ZORDER BY (department, hire_date)"</span>)
+<span class="cm"># Now queries filtering by department read far fewer files</span>
+
+<span class="cm"># VACUUM: remove old data files no longer referenced by transaction log</span>
+<span class="cm"># Default retention = 7 days (for time travel)</span>
+spark.<span class="fn">sql</span>(<span class="str">"VACUUM delta.`/delta/employees/`"</span>)                    <span class="cm"># 7 day default</span>
+spark.<span class="fn">sql</span>(<span class="str">"VACUUM delta.`/delta/employees/` RETAIN 168 HOURS"</span>) <span class="cm"># explicit 7 days</span>
+
+<span class="cm"># WARNING: reducing retention too low breaks time travel</span>
+<span class="cm"># spark.sql("VACUUM delta.`/delta/employees/` RETAIN 0 HOURS")  # DANGEROUS</span>
+
+<span class="cm"># Auto Optimize in Databricks (set on table creation or ALTER)</span>
+spark.<span class="fn">sql</span>(<span class="str">"""
+    ALTER TABLE employees
+    SET TBLPROPERTIES (
+        'delta.autoOptimize.optimizeWrite' = 'true',
+        'delta.autoOptimize.autoCompact' = 'true'
+    )
+"""</span>)</code></pre>
+  </div>
+
+  <!-- QUIZ 6.3 -->
+  <div class="quiz-box" id="quiz63">
+    <div class="quiz-header">
+      <div class="quiz-title">Quick Check — Delta Optimization</div>
+      <div class="quiz-progress" id="qp63">Question 1 of 4</div>
+    </div>
+    <div id="quiz63-body"></div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ===== INTERVIEW QUESTIONS ===== -->
+<section class="section" id="sIQ">
+  <div class="section-title">Interview Questions</div>
+  <p class="section-desc">12 real interview questions covering Spark optimization and Delta Lake — from entry-level to senior engineer difficulty.</p>
+
+  <div id="iqList">
+
+    <div class="iq-item" onclick="toggleIQ(this)">
+      <div class="iq-header">
+        <div class="iq-q">What is the difference between repartition() and coalesce()?</div>
+        <div class="iq-badges"><span class="badge badge-easy">Easy</span><span class="iq-toggle">▼</span></div>
+      </div>
+      <div class="iq-body"><strong>repartition(n)</strong> performs a full shuffle and can increase or decrease partition count with even distribution. <strong>coalesce(n)</strong> avoids shuffle by merging partitions on the same executor — only decreases count and may be uneven. Use <strong>coalesce</strong> when reducing partitions (e.g., before write), use <strong>repartition</strong> when increasing or when you need even distribution for joins.</div>
+    </div>
+
+    <div class="iq-item" onclick="toggleIQ(this)">
+      <div class="iq-header">
+        <div class="iq-q">What operations cause shuffles in Spark?</div>
+        <div class="iq-badges"><span class="badge badge-easy">Easy</span><span class="iq-toggle">▼</span></div>
+      </div>
+      <div class="iq-body"><strong>groupBy, orderBy, distinct, join (non-broadcast), repartition.</strong> Shuffles move data across the network between executors — the most expensive operation in Spark because it involves serialization, network transfer, and deserialization. filter, select, withColumn, and coalesce do NOT cause shuffles.</div>
+    </div>
+
+    <div class="iq-item" onclick="toggleIQ(this)">
+      <div class="iq-header">
+        <div class="iq-q">What is the difference between cache() and persist()?</div>
+        <div class="iq-badges"><span class="badge badge-medium">Medium</span><span class="iq-toggle">▼</span></div>
+      </div>
+      <div class="iq-body"><strong>cache()</strong> is shorthand for <strong>persist(StorageLevel.MEMORY_AND_DISK)</strong>. <strong>persist()</strong> lets you specify the storage level explicitly: MEMORY_ONLY (fastest, recomputes on OOM), MEMORY_AND_DISK (default), DISK_ONLY (always fits, slowest), MEMORY_AND_DISK_2 (replicated for fault tolerance). Use persist() when you need fine control over the memory vs. disk tradeoff.</div>
+    </div>
+
+    <div class="iq-item" onclick="toggleIQ(this)">
+      <div class="iq-header">
+        <div class="iq-q">Explain Catalyst Optimizer's 4 phases.</div>
+        <div class="iq-badges"><span class="badge badge-medium">Medium</span><span class="iq-toggle">▼</span></div>
+      </div>
+      <div class="iq-body">1) <strong>Analysis</strong> — resolves column names, validates schema, checks types. 2) <strong>Logical Optimization</strong> — applies rule-based optimizations: predicate pushdown, column pruning, constant folding. 3) <strong>Physical Planning</strong> — generates multiple physical plans, chooses the best based on cost model (e.g., decides broadcast vs. sort-merge join). 4) <strong>Code Generation</strong> — Tungsten engine generates optimized JVM bytecode, operates on binary data to minimize serialization overhead.</div>
+    </div>
+
+    <div class="iq-item" onclick="toggleIQ(this)">
+      <div class="iq-header">
+        <div class="iq-q">What are Delta Lake's ACID properties?</div>
+        <div class="iq-badges"><span class="badge badge-medium">Medium</span><span class="iq-toggle">▼</span></div>
+      </div>
+      <div class="iq-body"><strong>Atomicity</strong> — writes fully succeed or fail, no partial writes that corrupt the table. <strong>Consistency</strong> — schema enforced on every write, constraints respected, table always in valid state. <strong>Isolation</strong> — concurrent writers use optimistic concurrency control via the transaction log, don't corrupt each other. <strong>Durability</strong> — committed data persists through failures because the transaction log is stored on durable object storage.</div>
+    </div>
+
+    <div class="iq-item" onclick="toggleIQ(this)">
+      <div class="iq-header">
+        <div class="iq-q">How do you query a previous version of a Delta table?</div>
+        <div class="iq-badges"><span class="badge badge-easy">Easy</span><span class="iq-toggle">▼</span></div>
+      </div>
+      <div class="iq-body">Time travel using <strong>versionAsOf</strong> or <strong>timestampAsOf</strong> option. Example:<br><code>spark.read.format("delta").option("versionAsOf", 1).load(path)</code><br>or<br><code>spark.read.format("delta").option("timestampAsOf", "2024-01-02").load(path)</code><br>Only works if the underlying data files haven't been removed by VACUUM.</div>
+    </div>
+
+    <div class="iq-item" onclick="toggleIQ(this)">
+      <div class="iq-header">
+        <div class="iq-q">When would you use MERGE vs simple overwrite?</div>
+        <div class="iq-badges"><span class="badge badge-hard">Hard</span><span class="iq-toggle">▼</span></div>
+      </div>
+      <div class="iq-body">Use <strong>MERGE</strong> for incremental loads, CDC processing, SCD Type 1 (update existing records), or when you need to handle inserts + updates + deletes atomically in one pass. Use <strong>overwrite</strong> for full refreshes, initial loads, or when the source represents the complete current dataset. MERGE is slower (requires scanning target to match) but preserves existing records not present in the source batch.</div>
+    </div>
+
+    <div class="iq-item" onclick="toggleIQ(this)">
+      <div class="iq-header">
+        <div class="iq-q">What is the difference between OPTIMIZE and VACUUM?</div>
+        <div class="iq-badges"><span class="badge badge-medium">Medium</span><span class="iq-toggle">▼</span></div>
+      </div>
+      <div class="iq-body"><strong>OPTIMIZE</strong> compacts many small Parquet files into fewer larger files (default 1GB target), improving read performance by reducing I/O overhead. It does NOT delete any data. <strong>VACUUM</strong> removes old Parquet files that are no longer referenced by the transaction log, freeing actual storage. VACUUM has a retention period (default 7 days) to preserve files needed for time travel. Run OPTIMIZE for performance, VACUUM for storage costs.</div>
+    </div>
+
+    <div class="iq-item" onclick="toggleIQ(this)">
+      <div class="iq-header">
+        <div class="iq-q">Explain Z-ORDER and when to use it.</div>
+        <div class="iq-badges"><span class="badge badge-hard">Hard</span><span class="iq-toggle">▼</span></div>
+      </div>
+      <div class="iq-body"><strong>Z-ORDER</strong> co-locates related data within Parquet files using a space-filling curve algorithm. When you filter on Z-ORDERed columns, Delta's data-skipping statistics let it skip entire files that don't match. Best for <strong>high-cardinality columns</strong> frequently used in WHERE clauses (department, date, customer_id). Run as: <code>OPTIMIZE table ZORDER BY (col1, col2)</code>. Not beneficial for low-cardinality columns (e.g., boolean, status with 3 values) — partitioning is better for those.</div>
+    </div>
+
+    <div class="iq-item" onclick="toggleIQ(this)">
+      <div class="iq-header">
+        <div class="iq-q">What causes the small files problem and how do you fix it?</div>
+        <div class="iq-badges"><span class="badge badge-medium">Medium</span><span class="iq-toggle">▼</span></div>
+      </div>
+      <div class="iq-body"><strong>Cause:</strong> Frequent small appends (streaming micro-batches, hourly CDC loads) each create new small Parquet files. After 1000 loads, a simple scan reads 1000 files — each requiring separate I/O + metadata overhead. <strong>Fix:</strong> Run OPTIMIZE regularly (daily or post-load), enable <code>delta.autoOptimize.autoCompact = true</code> in Databricks, use coalesce before writes, batch small writes into larger ones, or enable <code>delta.autoOptimize.optimizeWrite</code> for automatic bin-packing.</div>
+    </div>
+
+    <div class="iq-item" onclick="toggleIQ(this)">
+      <div class="iq-header">
+        <div class="iq-q">How do you configure the broadcast join threshold?</div>
+        <div class="iq-badges"><span class="badge badge-easy">Easy</span><span class="iq-toggle">▼</span></div>
+      </div>
+      <div class="iq-body"><code>spark.conf.set("spark.sql.autoBroadcastJoinThreshold", "50m")</code> sets the threshold to 50MB. Default is 10MB. Tables smaller than the threshold are automatically broadcast to all executors, eliminating shuffle. You can also force a broadcast explicitly: <code>df.join(broadcast(small_df), "key")</code>. Set to -1 to disable auto-broadcast entirely.</div>
+    </div>
+
+    <div class="iq-item" onclick="toggleIQ(this)">
+      <div class="iq-header">
+        <div class="iq-q">How do you choose a partitioning strategy for a large Delta table?</div>
+        <div class="iq-badges"><span class="badge badge-hard">Hard</span><span class="iq-toggle">▼</span></div>
+      </div>
+      <div class="iq-body">Partition by <strong>low-cardinality, frequently filtered columns</strong> (date, region, department). Avoid high-cardinality columns (id, timestamp) — creates too many small partition directories. Target 1GB+ per partition directory for efficient reads. Use <strong>Z-ORDER within partitions</strong> for secondary filter columns (e.g., partition by date, Z-ORDER by customer_id for fast customer lookups within a date range). For time-series data: partition by year/month, not full date if data is sparse per day.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <a href="spark.html" class="btn-nav btn-nav-prev">← Back: Spark</a>
+  <a href="azure.html" class="btn-nav btn-nav-next">Next: Azure →</a>
+</div>
+
+</main>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAuth()">✕</button>
+    <h2>Sign In</h2>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="authEmail" placeholder="you@example.com">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="authPassword" placeholder="••••••••">
+    </div>
+    <div id="auth-error"></div>
+    <button class="btn-signin" onclick="signIn()">Sign In</button>
+    <div class="modal-footer">Don't have an account? <a href="#" onclick="showSignUp()">Sign Up</a></div>
+  </div>
+</div>
+
+<script>
+// ===== FIREBASE CONFIG =====
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+try {
+  firebase.initializeApp(firebaseConfig);
+  firebase.auth().onAuthStateChanged(user => {
+    const btn = document.getElementById('authBtn');
+    if (user) { btn.textContent = 'Sign Out'; }
+    else { btn.textContent = 'Sign In'; }
+  });
+} catch(e) { console.warn('Firebase not configured:', e.message); }
+
+function toggleAuth() {
+  const btn = document.getElementById('authBtn');
+  if (btn.textContent === 'Sign Out') {
+    try { firebase.auth().signOut(); } catch(e) {}
+  } else {
+    document.getElementById('authModal').classList.add('show');
+  }
+}
+function closeAuth() { document.getElementById('authModal').classList.remove('show'); }
+function showSignUp() { alert('Sign up coming soon!'); }
+async function signIn() {
+  const email = document.getElementById('authEmail').value;
+  const pwd = document.getElementById('authPassword').value;
+  const errEl = document.getElementById('auth-error');
+  try {
+    await firebase.auth().signInWithEmailAndPassword(email, pwd);
+    closeAuth();
+  } catch(e) {
+    errEl.textContent = e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+// ===== SCROLL HELPERS =====
+function scrollTo51(){document.getElementById('s51').scrollIntoView({behavior:'smooth'});}
+function scrollTo52(){document.getElementById('s52').scrollIntoView({behavior:'smooth'});}
+function scrollTo53(){document.getElementById('s53').scrollIntoView({behavior:'smooth'});}
+function scrollTo54(){document.getElementById('s54').scrollIntoView({behavior:'smooth'});}
+function scrollTo61(){document.getElementById('s61').scrollIntoView({behavior:'smooth'});}
+function scrollTo62(){document.getElementById('s62').scrollIntoView({behavior:'smooth'});}
+function scrollTo63(){document.getElementById('s63').scrollIntoView({behavior:'smooth'});}
+function scrollToIQ(){document.getElementById('sIQ').scrollIntoView({behavior:'smooth'});}
+
+// Active sidebar on scroll
+const sections = ['s51','s52','s53','s54','s61','s62','s63','sIQ'];
+const sidebarItems = document.querySelectorAll('.sidebar-item');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && window.scrollY >= el.offsetTop - 120) current = id;
+  });
+  sidebarItems.forEach((item,i) => {
+    item.classList.toggle('active', sections[i] === current);
+  });
+}, {passive:true});
+
+// ===== COPY CODE =====
+function copyCode(btn) {
+  const pre = btn.closest('.code-wrap').querySelector('pre');
+  const text = pre.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ===== INTERVIEW QUESTIONS TOGGLE =====
+function toggleIQ(item) {
+  item.classList.toggle('open');
+}
+
+// ===== PARTITION ANIMATION =====
+let partAnim = null;
+function setPartitionState(before, after) {
+  const beforeData = [50,10,30,10];
+  const afterData = [25,25,25,25];
+  [1,2,3,4].forEach(i => {
+    const bv = before ? beforeData[i-1] : afterData[i-1];
+    document.getElementById('eb'+i).style.width = bv+'%';
+    document.getElementById('ep'+i).textContent = bv+'%';
+    const av = after ? afterData[i-1] : 10;
+    document.getElementById('ea'+i).style.width = av+'%';
+    document.getElementById('ap'+i).textContent = av+'%';
+  });
+}
+function playPartitionAnim() {
+  setPartitionState(true, false);
+  setTimeout(() => {
+    [1,2,3,4].forEach(i => {
+      document.getElementById('ea'+i).style.width = '25%';
+      document.getElementById('ap'+i).textContent = '25%';
+    });
+  }, 800);
+  if (partAnim) clearInterval(partAnim);
+  partAnim = setInterval(() => {
+    setPartitionState(true, false);
+    setTimeout(() => {
+      [1,2,3,4].forEach(i => {
+        document.getElementById('ea'+i).style.width = '25%';
+        document.getElementById('ap'+i).textContent = '25%';
+      });
+    }, 800);
+  }, 4000);
+}
+document.addEventListener('DOMContentLoaded', () => setTimeout(playPartitionAnim, 500));
+
+// ===== SHUFFLE ANIMATION =====
+let shuffleAnim = null;
+function createPacket(container, color, tx, ty) {
+  const p = document.createElement('div');
+  p.style.cssText = `position:absolute;width:8px;height:8px;border-radius:50%;background:${color};top:50%;left:50%;--tx:${tx}px;--ty:${ty}px;animation:packetMove 1s ease forwards;`;
+  container.appendChild(p);
+  setTimeout(() => p.remove(), 1000);
+}
+function playShuffleAnim() {
+  const colors = ['#f97316','#3b82f6','#10b981','#8b5cf6'];
+  const boxes = [1,2,3,4].map(i => document.getElementById('se'+i));
+  let t = 0;
+  function doShuffle() {
+    boxes.forEach((box, i) => {
+      colors.forEach((color, j) => {
+        if (i !== j) {
+          const dx = (j % 2 - i % 2) * 70;
+          const dy = (Math.floor(j/2) - Math.floor(i/2)) * 70;
+          setTimeout(() => createPacket(box, color, dx, dy), t + j * 120);
+        }
+      });
+    });
+    t += 600;
+  }
+  doShuffle();
+  if (shuffleAnim) clearInterval(shuffleAnim);
+  shuffleAnim = setInterval(doShuffle, 3000);
+}
+document.addEventListener('DOMContentLoaded', () => setTimeout(playShuffleAnim, 800));
+
+// ===== CACHE ANIMATION =====
+let cacheAnim = null;
+function playCacheAnim() {
+  const steps1 = ['ts1-1','ts1-2','ts1-3','ts1-4'];
+  const steps2 = ['ts2-1','ts2-2','ts2-3'];
+  steps1.concat(steps2).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  document.getElementById('tt1').style.display = 'none';
+  document.getElementById('tt2').style.display = 'none';
+  let delay = 200;
+  steps1.forEach(id => {
+    setTimeout(() => { const el = document.getElementById(id); if(el) el.classList.add('active'); }, delay);
+    delay += 700;
+  });
+  setTimeout(() => { document.getElementById('tt1').style.display = 'inline'; }, delay);
+  delay += 400;
+  steps2.forEach(id => {
+    setTimeout(() => { const el = document.getElementById(id); if(el) el.classList.add('active'); }, delay);
+    delay += 700;
+  });
+  setTimeout(() => { document.getElementById('tt2').style.display = 'inline'; }, delay);
+  if (cacheAnim) clearInterval(cacheAnim);
+  cacheAnim = setInterval(playCacheAnim, 5000);
+}
+document.addEventListener('DOMContentLoaded', () => setTimeout(playCacheAnim, 1000));
+
+// ===== CATALYST ANIMATION =====
+let catalystAnim = null;
+function playCatalystAnim() {
+  const boxes = [1,2,3,4].map(i => document.getElementById('cb'+i));
+  boxes.forEach(b => b && b.classList.remove('glow'));
+  let delay = 200;
+  boxes.forEach((box, i) => {
+    setTimeout(() => {
+      boxes.forEach(b => b && b.classList.remove('glow'));
+      if (box) box.classList.add('glow');
+    }, delay + i * 1000);
+  });
+  setTimeout(() => { boxes.forEach(b => b && b.classList.remove('glow')); }, delay + 4000);
+  if (catalystAnim) clearInterval(catalystAnim);
+  catalystAnim = setInterval(playCatalystAnim, 5500);
+}
+document.addEventListener('DOMContentLoaded', () => setTimeout(playCatalystAnim, 1200));
+
+// ===== VERSION TIMELINE ANIMATION =====
+let versionAnim = null;
+function playVersionAnim() {
+  [0,1,2,3,4].forEach(i => {
+    const dot = document.getElementById('vd'+i);
+    if (dot) dot.classList.remove('visible');
+  });
+  [0,1,2,3,4].forEach(i => {
+    setTimeout(() => {
+      const dot = document.getElementById('vd'+i);
+      if (dot) dot.classList.add('visible');
+    }, 300 + i * 600);
+  });
+  if (versionAnim) clearInterval(versionAnim);
+  versionAnim = setInterval(playVersionAnim, 5000);
+}
+document.addEventListener('DOMContentLoaded', () => setTimeout(playVersionAnim, 1000));
+
+// ===== MERGE ANIMATION =====
+let mergeAnimTimer = null;
+function playMergeAnim() {
+  document.getElementById('mr-r99').style.opacity = '0';
+  const arrows = document.querySelectorAll('#mergeArrows .merge-arrow');
+  arrows.forEach(a => { a.style.opacity = '0'; a.style.animation = 'none'; });
+  setTimeout(() => {
+    arrows.forEach((a, i) => {
+      a.style.animation = `fadeIn 0.4s ease ${i * 0.6}s forwards`;
+    });
+    setTimeout(() => { document.getElementById('mr-r99').style.opacity = '1'; }, 1800);
+  }, 100);
+  if (mergeAnimTimer) clearInterval(mergeAnimTimer);
+  mergeAnimTimer = setInterval(playMergeAnim, 4000);
+}
+document.addEventListener('DOMContentLoaded', () => setTimeout(playMergeAnim, 800));
+
+// ===== COMPACT ANIMATION =====
+let compactAnimTimer = null;
+function playCompactAnim() {
+  const smallFiles = document.querySelectorAll('#smallFiles .small-file');
+  document.getElementById('lf1').style.transform = 'scale(0)';
+  document.getElementById('lf2').style.transform = 'scale(0)';
+  document.getElementById('compactAfter').style.opacity = '0';
+  document.getElementById('compactLabel').textContent = '';
+  smallFiles.forEach(f => { f.style.opacity = '0.8'; f.style.transform = 'scale(1)'; });
+  setTimeout(() => {
+    smallFiles.forEach((f, i) => {
+      f.style.transition = 'all 0.5s ease ' + (i * 0.05) + 's';
+      f.style.transform = 'scale(0)';
+      f.style.opacity = '0';
+    });
+  }, 500);
+  setTimeout(() => {
+    document.getElementById('lf1').style.transition = 'transform 0.5s ease';
+    document.getElementById('lf2').style.transition = 'transform 0.5s ease 0.2s';
+    document.getElementById('lf1').style.transform = 'scale(1)';
+    document.getElementById('lf2').style.transform = 'scale(1)';
+    document.getElementById('compactAfter').style.opacity = '1';
+    document.getElementById('compactLabel').textContent = 'Faster reads, better performance';
+  }, 1500);
+  setTimeout(() => {
+    smallFiles.forEach(f => { f.style.transition = 'all 0.3s ease'; f.style.transform = 'scale(1)'; f.style.opacity = '0.8'; });
+    document.getElementById('lf1').style.transform = 'scale(0)';
+    document.getElementById('lf2').style.transform = 'scale(0)';
+    document.getElementById('compactAfter').style.opacity = '0';
+    document.getElementById('compactLabel').textContent = '';
+  }, 2800);
+  if (compactAnimTimer) clearInterval(compactAnimTimer);
+  compactAnimTimer = setInterval(playCompactAnim, 3500);
+}
+document.addEventListener('DOMContentLoaded', () => setTimeout(playCompactAnim, 1500));
+
+// ===== QUIZ ENGINE =====
+const quizData = {
+  q51: {
+    title: 'Partitions', progress: 'qp51', body: 'quiz51-body',
+    questions: [
+      { q: 'What is the default value of spark.sql.shuffle.partitions?', opts: ['50','200','100','500'], correct: 1, exp: 'The default shuffle partition count is 200. This is often too high for small datasets — reduce it for better performance on smaller jobs.' },
+      { q: 'Which operation performs a full shuffle?', opts: ['coalesce','repartition','filter','select'], correct: 1, exp: 'repartition() always performs a full shuffle across the network to ensure even distribution. coalesce merges locally without a shuffle.' },
+      { q: 'What is the optimal partition size?', opts: ['10 MB','64 MB','128 MB','512 MB'], correct: 2, exp: '128 MB is the widely recommended target partition size. Smaller = too much overhead; larger = risk of OOM errors.' },
+      { q: 'When should you use coalesce instead of repartition?', opts: ['To increase partitions','When you need even distribution','To decrease partitions without shuffle','After a join'], correct: 2, exp: 'coalesce is the right choice when reducing partition count (e.g., before writing output) because it avoids the costly network shuffle.' }
+    ]
+  },
+  q52: {
+    title: 'Shuffles', progress: 'qp52', body: 'quiz52-body',
+    questions: [
+      { q: 'Which operation does NOT cause a shuffle?', opts: ['groupBy','filter','orderBy','distinct'], correct: 1, exp: 'filter is a narrow transformation — data stays on the same executor, no network movement needed. All others require data redistribution.' },
+      { q: 'What is the default broadcast join threshold?', opts: ['5 MB','10 MB','50 MB','100 MB'], correct: 1, exp: 'The default autoBroadcastJoinThreshold is 10 MB. Tables smaller than this are automatically broadcast to all executors.' },
+      { q: 'What makes shuffles expensive?', opts: ['CPU usage','Network data transfer','Memory allocation','File I/O'], correct: 1, exp: 'Shuffles require serializing data, sending it across the network to different executors, and deserializing it — network transfer is the primary cost.' },
+      { q: 'Bucketing helps by:', opts: ['Compressing data','Pre-sorting within partitions','Avoiding shuffle for repeated joins on same key','Reducing file count'], correct: 2, exp: 'Bucketing pre-partitions data on disk by the join key. When the same bucketed table is joined repeatedly, Spark can skip the shuffle entirely.' }
+    ]
+  },
+  q53: {
+    title: 'Caching', progress: 'qp53', body: 'quiz53-body',
+    questions: [
+      { q: 'What does cache() use as default storage level?', opts: ['MEMORY_ONLY','MEMORY_AND_DISK','DISK_ONLY','MEMORY_AND_DISK_2'], correct: 1, exp: 'cache() is a shortcut for persist(StorageLevel.MEMORY_AND_DISK). It stores in memory first, spills to disk if needed.' },
+      { q: 'When is caching NOT beneficial?', opts: ['Multiple reuses','Large DataFrames with loops','Single use DataFrames','After expensive joins'], correct: 2, exp: 'If a DataFrame is only used once, the overhead of caching (extra computation + memory pressure) outweighs any benefit. Cache only when reusing.' },
+      { q: 'Which storage level is fault tolerant?', opts: ['MEMORY_ONLY','DISK_ONLY','MEMORY_AND_DISK','MEMORY_AND_DISK_2'], correct: 3, exp: 'MEMORY_AND_DISK_2 replicates cached data across 2 nodes. If one executor fails, the data is available from the replica without recomputation.' },
+      { q: 'What triggers actual caching?', opts: ['cache() call','persist() call','First action after cache()','DataFrame creation'], correct: 2, exp: 'Spark is lazy — cache() and persist() just mark the DataFrame. The actual caching happens when the first action (count, show, etc.) is executed.' }
+    ]
+  },
+  q54: {
+    title: 'Catalyst Optimizer', progress: 'qp54', body: 'quiz54-body',
+    questions: [
+      { q: 'What does predicate pushdown do?', opts: ['Sorts data earlier','Moves filters closer to data source','Removes duplicate columns','Combines multiple filters'], correct: 1, exp: 'Predicate pushdown moves WHERE filters as close to the data source as possible. For Parquet, this means skipping entire row groups that don\'t match.' },
+      { q: 'Column pruning means:', opts: ['Removing null columns','Only reading needed columns','Dropping columns with errors','Renaming columns'], correct: 1, exp: 'Column pruning means Catalyst only reads columns actually referenced in your query. Parquet\'s columnar format makes this essentially free.' },
+      { q: 'Which phase generates JVM bytecode?', opts: ['Analysis','Logical Optimization','Physical Planning','Code Generation'], correct: 3, exp: 'The Code Generation phase uses Tungsten to generate optimized JVM bytecode specific to your query, eliminating generic row-by-row interpretation overhead.' },
+      { q: 'Catalyst is:', opts: ['A data format','A storage layer','Spark\'s automatic query optimizer','A cluster manager'], correct: 2, exp: 'Catalyst is Spark SQL\'s built-in query optimizer. It automatically transforms your logical plan into an efficient physical execution plan.' }
+    ]
+  },
+  q61: {
+    title: 'Delta Fundamentals', progress: 'qp61', body: 'quiz61-body',
+    questions: [
+      { q: 'What does ACID stand for?', opts: ['Atomicity, Consistency, Isolation, Durability','Async, Concurrent, Indexed, Durable','Atomic, Cache, Integrate, Delete','None of the above'], correct: 0, exp: 'ACID = Atomicity (all-or-nothing writes), Consistency (schema/constraints always valid), Isolation (concurrent writes don\'t corrupt), Durability (committed data persists).' },
+      { q: 'Where does Delta store its transaction log?', opts: ['_delta_history/','_delta_log/','_transaction_log/','_metadata/'], correct: 1, exp: 'Delta Lake stores its transaction log in the _delta_log/ directory at the root of the table. Each JSON file represents one atomic transaction.' },
+      { q: 'Time travel allows:', opts: ['Faster queries','Querying previous versions of data','Automatic optimization','Schema changes'], correct: 1, exp: 'Time travel lets you query any previous version of a Delta table using versionAsOf or timestampAsOf, as long as VACUUM hasn\'t removed the files.' },
+      { q: 'What happens when you write bad schema to Delta?', opts: ['It auto-converts','It silently ignores','It throws DeltaAnalysisException','It creates a new table'], correct: 2, exp: 'Delta\'s schema enforcement rejects writes that don\'t match the existing schema with a DeltaAnalysisException. Use mergeSchema=true to opt into schema evolution.' },
+      { q: 'To allow new columns on append, use:', opts: ['schema="evolve"','mergeSchema="true"','allowNewColumns=True','schemaEvolution=enabled'], correct: 1, exp: 'Set the option mergeSchema="true" on your write operation to allow Delta to add new columns from the incoming DataFrame to the existing schema.' }
+    ]
+  },
+  q62: {
+    title: 'MERGE / Upsert', progress: 'qp62', body: 'quiz62-body',
+    questions: [
+      { q: 'MERGE combines which operations?', opts: ['Read and Write','Insert, Update, and Delete','Filter and Join','Cache and Persist'], correct: 1, exp: 'MERGE atomically handles Insert (new records), Update (existing records), and Delete (flagged records) in a single pass over the target table.' },
+      { q: 'whenNotMatchedInsert handles:', opts: ['Existing records','Deleted records','New records not in target','Schema mismatches'], correct: 2, exp: 'whenNotMatchedInsert fires when a source record has no matching row in the target table — it inserts the record as a new row.' },
+      { q: 'MERGE is essential for:', opts: ['Schema evolution','Time travel','Incremental/CDC loads','File compaction'], correct: 2, exp: 'MERGE is the core operation for incremental data processing: CDC (Change Data Capture), SCD Type 1 updates, and daily fact table refreshes that need to update existing rows.' },
+      { q: 'The merge condition:', opts: ['Filters source data','Matches source to target rows','Defines insert columns','Sets update values'], correct: 1, exp: 'The merge condition (e.g., "target.id = source.id") is the JOIN predicate that determines which source rows match existing target rows.' }
+    ]
+  },
+  q63: {
+    title: 'Delta Optimization', progress: 'qp63', body: 'quiz63-body',
+    questions: [
+      { q: 'What does OPTIMIZE do?', opts: ['Deletes old data','Compacts small files into larger ones','Updates statistics','Rebuilds indexes'], correct: 1, exp: 'OPTIMIZE reads many small Parquet files and rewrites them as fewer, larger files (targeting ~1GB each). This dramatically improves scan performance.' },
+      { q: 'Z-ORDER helps with:', opts: ['File compression','Co-locating related data for filter queries','Automatic partitioning','Schema validation'], correct: 1, exp: 'Z-ORDER co-locates related values in the same Parquet files so Delta can skip entire files when filtering. Most effective for high-cardinality filter columns.' },
+      { q: 'Default VACUUM retention period:', opts: ['1 day','3 days','7 days','30 days'], correct: 2, exp: 'VACUUM defaults to 7 days (168 hours) retention. Files younger than 7 days are preserved for time travel. Reducing this below your time travel window will break it.' },
+      { q: 'Running VACUUM with 0 hours retention:', opts: ['Is recommended for storage savings','Has no effect','Breaks time travel','Improves performance'], correct: 2, exp: 'VACUUM with 0 hours deletes all unreferenced files immediately, including those needed for any time travel query. This permanently destroys your history.' }
+    ]
+  }
+};
+
+const quizState = {};
+
+function initQuiz(key) {
+  const data = quizData[key];
+  if (!data) return;
+  quizState[key] = { current: 0, score: 0 };
+  renderQuestion(key);
+}
+
+function renderQuestion(key) {
+  const data = quizData[key];
+  const state = quizState[key];
+  const bodyEl = document.getElementById(data.body);
+  const progEl = document.getElementById(data.progress);
+  if (!bodyEl) return;
+  const total = data.questions.length;
+  if (state.current >= total) {
+    progEl.textContent = 'Complete!';
+    bodyEl.innerHTML = `<div class="quiz-score" style="display:block;">
+      <div class="score-val">${state.score}/${total}</div>
+      <p>${state.score === total ? 'Perfect score! Excellent work.' : state.score >= total*0.75 ? 'Great job! Almost there.' : 'Keep practicing — review the sections above.'}</p>
+      <button class="quiz-retry-btn" onclick="retryQuiz('${key}')">Try Again</button>
+    </div>`;
+    return;
+  }
+  const q = data.questions[state.current];
+  progEl.textContent = `Question ${state.current+1} of ${total}`;
+  bodyEl.innerHTML = `
+    <div class="quiz-q">
+      <div class="quiz-q-text">${q.q}</div>
+      <div class="quiz-options">
+        ${q.opts.map((opt, i) => `<button class="quiz-opt" onclick="answerQuiz('${key}',${i})" data-idx="${i}">${String.fromCharCode(65+i)}) ${opt}</button>`).join('')}
+      </div>
+      <div class="quiz-explanation" id="qexp-${key}">${q.exp}</div>
+      <button class="quiz-next-btn" id="qnext-${key}" onclick="nextQuestion('${key}')">Next Question →</button>
+    </div>`;
+}
+
+function answerQuiz(key, chosen) {
+  const data = quizData[key];
+  const state = quizState[key];
+  const q = data.questions[state.current];
+  const bodyEl = document.getElementById(data.body);
+  const opts = bodyEl.querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.disabled = true);
+  opts[q.correct].classList.add('correct');
+  if (chosen !== q.correct) {
+    opts[chosen].classList.add('wrong');
+  } else {
+    state.score++;
+  }
+  document.getElementById('qexp-'+key).style.display = 'block';
+  document.getElementById('qnext-'+key).style.display = 'inline-block';
+}
+
+function nextQuestion(key) {
+  quizState[key].current++;
+  renderQuestion(key);
+}
+
+function retryQuiz(key) {
+  quizState[key] = { current: 0, score: 0 };
+  renderQuestion(key);
+}
+
+// Init all quizzes on load
+document.addEventListener('DOMContentLoaded', () => {
+  Object.keys(quizData).forEach(k => initQuiz(k));
+});
+</script>
+</body>
+</html>
