@@ -907,53 +907,112 @@ ORDER BY department, hire_date;</code></pre>
     </div>
   </div>
 
-  <div class="venn-grid">
-    <div class="venn-card">
-      <h4>INNER JOIN</h4>
-      <svg width="200" height="130" viewBox="0 0 200 130">
-        <circle cx="75" cy="65" r="50" fill="#4f8ef7" opacity=".25" stroke="#4f8ef7" stroke-width="2"/>
-        <circle cx="125" cy="65" r="50" fill="#8b5cf6" opacity=".25" stroke="#8b5cf6" stroke-width="2"/>
-        <path d="M100,20 A50,50 0 0,1 100,110 A50,50 0 0,1 100,20" fill="#4f8ef7" opacity=".5"/>
-        <text x="100" y="68" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#2563eb" font-weight="700">MATCH</text>
-        <text x="55" y="120" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#4b5563">employees</text>
-        <text x="145" y="120" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#4b5563">departments</text>
-      </svg>
-      <p style="font-size:.78rem;color:#4b5563;">Only matched rows from both tables</p>
+  <!-- Animated Venn diagram - auto-cycles through all JOIN types -->
+  <div style="background:linear-gradient(135deg,#f0f4ff,#faf0ff);border-radius:16px;padding:28px;margin:24px 0;">
+    <div style="text-align:center;font-size:12px;font-weight:700;color:var(--muted,#6b7280);letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px">Auto-playing JOIN Visualizer - click any tab to explore</div>
+    <!-- Tab buttons -->
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px" id="join-tabs">
+      <button class="join-tab active" onclick="showJoin('inner',this)" style="padding:7px 16px;border-radius:20px;border:2px solid #4f8ef7;background:#4f8ef7;color:white;font-weight:700;font-size:13px;cursor:pointer;font-family:Inter,sans-serif;">INNER</button>
+      <button class="join-tab" onclick="showJoin('left',this)" style="padding:7px 16px;border-radius:20px;border:2px solid #e5e7eb;background:white;color:#374151;font-weight:700;font-size:13px;cursor:pointer;font-family:Inter,sans-serif;">LEFT</button>
+      <button class="join-tab" onclick="showJoin('right',this)" style="padding:7px 16px;border-radius:20px;border:2px solid #e5e7eb;background:white;color:#374151;font-weight:700;font-size:13px;cursor:pointer;font-family:Inter,sans-serif;">RIGHT</button>
+      <button class="join-tab" onclick="showJoin('full',this)" style="padding:7px 16px;border-radius:20px;border:2px solid #e5e7eb;background:white;color:#374151;font-weight:700;font-size:13px;cursor:pointer;font-family:Inter,sans-serif;">FULL OUTER</button>
+      <button class="join-tab" onclick="showJoin('cross',this)" style="padding:7px 16px;border-radius:20px;border:2px solid #e5e7eb;background:white;color:#374151;font-weight:700;font-size:13px;cursor:pointer;font-family:Inter,sans-serif;">CROSS</button>
     </div>
-    <div class="venn-card">
-      <h4>LEFT JOIN</h4>
-      <svg width="200" height="130" viewBox="0 0 200 130">
-        <circle cx="75" cy="65" r="50" fill="#4f8ef7" opacity=".5" stroke="#4f8ef7" stroke-width="2"/>
-        <circle cx="125" cy="65" r="50" fill="#8b5cf6" opacity=".15" stroke="#8b5cf6" stroke-width="2"/>
-        <text x="60" y="68" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#2563eb" font-weight="700">ALL</text>
-        <text x="55" y="120" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#4b5563">employees</text>
-        <text x="145" y="120" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#4b5563">departments</text>
+    <!-- SVG canvas -->
+    <div style="display:flex;align-items:center;gap:32px;justify-content:center;flex-wrap:wrap;">
+      <svg id="venn-svg" width="260" height="160" viewBox="0 0 260 160" style="flex-shrink:0;">
+        <!-- Left circle -->
+        <circle id="venn-left" cx="100" cy="80" r="60" fill="#4f8ef7" fill-opacity="0.18" stroke="#4f8ef7" stroke-width="2.5"/>
+        <!-- Right circle -->
+        <circle id="venn-right" cx="160" cy="80" r="60" fill="#8b5cf6" fill-opacity="0.18" stroke="#8b5cf6" stroke-width="2.5"/>
+        <!-- Intersection highlight -->
+        <clipPath id="left-clip"><circle cx="100" cy="80" r="60"/></clipPath>
+        <circle id="venn-intersect" cx="160" cy="80" r="60" fill="#4f8ef7" fill-opacity="0" clip-path="url(#left-clip)" style="transition:fill-opacity 0.5s"/>
+        <!-- Labels -->
+        <text x="72" y="150" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11" fill="#374151" font-weight="600">Table A</text>
+        <text x="188" y="150" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11" fill="#374151" font-weight="600">Table B</text>
+        <!-- Row dots animation -->
+        <g id="venn-dots-left"></g>
+        <g id="venn-dots-right"></g>
+        <g id="venn-dots-result"></g>
       </svg>
-      <p style="font-size:.78rem;color:#4b5563;">All left rows + matched right rows (NULL if no match)</p>
-    </div>
-    <div class="venn-card">
-      <h4>RIGHT JOIN</h4>
-      <svg width="200" height="130" viewBox="0 0 200 130">
-        <circle cx="75" cy="65" r="50" fill="#4f8ef7" opacity=".15" stroke="#4f8ef7" stroke-width="2"/>
-        <circle cx="125" cy="65" r="50" fill="#8b5cf6" opacity=".5" stroke="#8b5cf6" stroke-width="2"/>
-        <text x="140" y="68" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#7c3aed" font-weight="700">ALL</text>
-        <text x="55" y="120" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#4b5563">employees</text>
-        <text x="145" y="120" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#4b5563">departments</td>
-      </svg>
-      <p style="font-size:.78rem;color:#4b5563;">All right rows + matched left rows (NULL if no match)</p>
-    </div>
-    <div class="venn-card">
-      <h4>FULL OUTER JOIN</h4>
-      <svg width="200" height="130" viewBox="0 0 200 130">
-        <circle cx="75" cy="65" r="50" fill="#4f8ef7" opacity=".4" stroke="#4f8ef7" stroke-width="2"/>
-        <circle cx="125" cy="65" r="50" fill="#8b5cf6" opacity=".4" stroke="#8b5cf6" stroke-width="2"/>
-        <text x="100" y="68" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#1a1a2e" font-weight="700">ALL</text>
-        <text x="55" y="120" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#4b5563">employees</text>
-        <text x="145" y="120" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#4b5563">departments</text>
-      </svg>
-      <p style="font-size:.78rem;color:#4b5563;">All rows from both tables, NULLs where no match</p>
+      <div id="venn-desc" style="max-width:240px;">
+        <div id="venn-title" style="font-size:18px;font-weight:800;color:#1e293b;margin-bottom:8px">INNER JOIN</div>
+        <div id="venn-subtitle" style="font-size:13px;color:#6b7280;line-height:1.7;margin-bottom:10px">Returns only rows where the join key exists in <strong>both</strong> tables. Non-matching rows are excluded from both sides.</div>
+        <div id="venn-result-label" style="font-size:12px;font-weight:700;color:#4f8ef7;background:#eff6ff;padding:6px 12px;border-radius:8px;display:inline-block">Result: matched rows only</div>
+      </div>
     </div>
   </div>
+  <script>
+  const joinData = {
+    inner: {
+      title: 'INNER JOIN',
+      subtitle: 'Returns only rows where the join key exists in <strong>both</strong> tables. Non-matching rows are excluded.',
+      result: 'matched rows only',
+      leftOp: 0.18, rightOp: 0.18, intersectOp: 0.65,
+      color: '#4f8ef7', leftStroke: '#4f8ef7', rightStroke: '#8b5cf6'
+    },
+    left: {
+      title: 'LEFT JOIN',
+      subtitle: 'Returns <strong>all rows from the left table</strong> plus matched rows from the right. Right side is NULL when no match.',
+      result: 'all of Table A + matched Table B (NULLs for no match)',
+      leftOp: 0.55, rightOp: 0.12, intersectOp: 0.35,
+      color: '#4f8ef7', leftStroke: '#4f8ef7', rightStroke: '#8b5cf6'
+    },
+    right: {
+      title: 'RIGHT JOIN',
+      subtitle: 'Returns <strong>all rows from the right table</strong> plus matched rows from the left. Left side is NULL when no match.',
+      result: 'all of Table B + matched Table A (NULLs for no match)',
+      leftOp: 0.12, rightOp: 0.55, intersectOp: 0.35,
+      color: '#8b5cf6', leftStroke: '#4f8ef7', rightStroke: '#8b5cf6'
+    },
+    full: {
+      title: 'FULL OUTER JOIN',
+      subtitle: 'Returns <strong>all rows from both tables</strong>. NULL on either side where there is no match.',
+      result: 'all rows from both tables (NULLs where no match)',
+      leftOp: 0.5, rightOp: 0.5, intersectOp: 0.55,
+      color: '#22c55e', leftStroke: '#4f8ef7', rightStroke: '#8b5cf6'
+    },
+    cross: {
+      title: 'CROSS JOIN',
+      subtitle: 'Returns the <strong>Cartesian product</strong> - every row in Table A paired with every row in Table B. No join condition needed.',
+      result: 'rows(A) x rows(B) combinations',
+      leftOp: 0.45, rightOp: 0.45, intersectOp: 0.6,
+      color: '#f97316', leftStroke: '#f97316', rightStroke: '#f97316'
+    }
+  };
+  function showJoin(type, btn) {
+    const d = joinData[type];
+    document.getElementById('venn-title').textContent = d.title;
+    document.getElementById('venn-subtitle').innerHTML = d.subtitle;
+    document.getElementById('venn-result-label').textContent = 'Result: ' + d.result;
+    document.getElementById('venn-result-label').style.color = d.color;
+    document.getElementById('venn-result-label').style.background = d.color + '18';
+    const lc = document.getElementById('venn-left');
+    const rc = document.getElementById('venn-right');
+    const ic = document.getElementById('venn-intersect');
+    lc.setAttribute('fill-opacity', d.leftOp);
+    lc.setAttribute('stroke', d.leftStroke);
+    rc.setAttribute('fill-opacity', d.rightOp);
+    rc.setAttribute('stroke', d.rightStroke);
+    ic.setAttribute('fill', d.color);
+    ic.setAttribute('fill-opacity', d.intersectOp);
+    document.querySelectorAll('.join-tab').forEach(b => {
+      b.style.background = 'white'; b.style.color = '#374151'; b.style.borderColor = '#e5e7eb';
+    });
+    if (btn) { btn.style.background = d.color; btn.style.color = 'white'; btn.style.borderColor = d.color; }
+  }
+  // Auto-cycle through join types
+  const joinOrder = ['inner','left','right','full','cross'];
+  let joinIdx = 0;
+  let joinTimer = setInterval(() => {
+    joinIdx = (joinIdx + 1) % joinOrder.length;
+    const tabs = document.querySelectorAll('.join-tab');
+    showJoin(joinOrder[joinIdx], tabs[joinIdx]);
+  }, 2500);
+  // Stop auto-cycle on manual click
+  document.getElementById('join-tabs').addEventListener('click', () => clearInterval(joinTimer));
+  </script>
 
   <div class="code-block">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
@@ -1169,6 +1228,7 @@ WHERE department = 'Engineering';
 -- Index Scan = using an index (fast)
 -- cost=0.00..8.17 rows=3 = estimated cost and rows</code></pre>
   </div>
+  <div class="quiz-container" id="quiz-optimize"></div>
 </section>
 
 <!-- SECTION 13: Interview Questions -->
@@ -2223,6 +2283,15 @@ initQuiz('quiz-where', whereQuestions, 'sql-where');
 initQuiz('quiz-groupby', groupbyQuestions, 'sql-groupby');
 initQuiz('quiz-joins', joinsQuestions, 'sql-joins');
 initQuiz('quiz-window', windowQuestions, 'sql-window');
+
+const optimizeQuestions = [
+  { question: "Why should you avoid using a function on an indexed column in the WHERE clause?", options: ["Functions make queries more readable", "Functions on indexed columns prevent the optimizer from using the index, causing a full table scan", "Functions are slower to execute", "There is no performance difference"], correct: 1, explanation: "WHERE YEAR(hire_date)=2020 wraps the column in a function - the DB can't use the index. Use a range instead: hire_date BETWEEN '2020-01-01' AND '2020-12-31'." },
+  { question: "What does EXPLAIN (or EXPLAIN ANALYZE) tell you about a query?", options: ["The query result rows", "The execution plan - how the DB will scan tables, use indexes, and estimate costs", "The syntax errors in your query", "The number of rows in the table"], correct: 1, explanation: "EXPLAIN shows the query execution plan - Seq Scan (full table scan = slow), Index Scan (uses index = fast), estimated costs, and row counts. Always check EXPLAIN before deploying to production." },
+  { question: "You have a 500M-row sales table partitioned by month. Your query filters WHERE sale_date >= '2024-01-01'. What makes this fast?", options: ["The query is slow - partitioning doesn't help", "Partition pruning - the DB skips all partitions before Jan 2024", "The index on sale_date", "Caching the previous query result"], correct: 1, explanation: "When you filter on the partition key, the DB performs partition pruning - it completely skips reading partitions that can't match the filter. Only Jan 2024 onwards partitions are read." },
+  { question: "What is a covering index?", options: ["An index that covers the whole table", "An index that contains all columns needed by a query - the DB reads only the index, never the table rows", "A partial index on a subset of rows", "An index on multiple tables"], correct: 1, explanation: "A covering index includes all columns needed: the filter column(s) AND the SELECT columns. The DB answers the entire query from the index without touching the main table rows - much faster." },
+  { question: "SELECT * is generally bad practice for performance because:", options: ["It is invalid SQL syntax", "It retrieves all columns including large text/blob columns, prevents index-only scans, and increases network transfer", "It always performs a full table scan", "It cannot be used with WHERE clauses"], correct: 1, explanation: "SELECT * fetches every column - including large unused ones like comments or blob fields. It also prevents covering index optimizations. Always select only the columns you actually need." }
+];
+initQuiz('quiz-optimize', optimizeQuestions, 'sql-optimize');
 </script>
 </body>
 </html>
