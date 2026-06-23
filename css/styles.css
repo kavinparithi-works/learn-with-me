@@ -156,11 +156,15 @@ code { font-family: 'JetBrains Mono', monospace; font-size: 0.83em; background: 
 .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
 .sidebar-section { margin-bottom: 6px; }
-.sidebar-section-title {
-  padding: 8px 20px 4px;
+.sidebar-section-title,
+.sidebar-section-label {
+  padding: 12px 24px 6px;
   font-size: 0.7rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.08em;
   color: var(--text-3);
+  white-space: normal;
+  word-wrap: break-word;
+  line-height: 1.4;
 }
 .sidebar-item {
   display: flex; align-items: center; gap: 10px;
