@@ -387,7 +387,7 @@ pre.code-block code{color:#cdd6f4;}
   </div>
 
   <div class="code-wrap">
-    <div class="code-label"><span>Python — Partitions</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <div class="code-label"><span>Python  -  Partitions</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
     <pre class="code-block"><code><span class="cm"># Check current partitions</span>
 <span class="fn">print</span>(df.rdd.getNumPartitions())  <span class="cm"># e.g., 200</span>
 
@@ -411,7 +411,7 @@ spark.conf.<span class="fn">set</span>(<span class="str">"spark.sql.shuffle.part
   <!-- QUIZ 5.1 -->
   <div class="quiz-box" id="quiz51">
     <div class="quiz-header">
-      <div class="quiz-title">Quick Check — Partitions</div>
+      <div class="quiz-title">Quick Check  -  Partitions</div>
       <div class="quiz-progress" id="qp51">Question 1 of 4</div>
     </div>
     <div id="quiz51-body"></div>
@@ -423,7 +423,7 @@ spark.conf.<span class="fn">set</span>(<span class="str">"spark.sql.shuffle.part
 <!-- ===== SECTION 5.2 SHUFFLES ===== -->
 <section class="section" id="s52">
   <div class="section-title"><span class="section-num">5.2</span> Shuffles</div>
-  <p class="section-desc">Shuffle = data moving across the network between executors. The most expensive Spark operation — minimize it wherever possible.</p>
+  <p class="section-desc">Shuffle = data moving across the network between executors. The most expensive Spark operation  -  minimize it wherever possible.</p>
 
   <div class="card-grid card-grid-4" style="margin-bottom:20px;">
     <div class="card">
@@ -479,7 +479,7 @@ spark.conf.<span class="fn">set</span>(<span class="str">"spark.sql.shuffle.part
   </div>
 
   <div class="code-wrap">
-    <div class="code-label"><span>Python — Reduce Shuffle Cost</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <div class="code-label"><span>Python  -  Reduce Shuffle Cost</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
     <pre class="code-block"><code><span class="cm"># What triggers a shuffle</span>
 df.<span class="fn">groupBy</span>(<span class="str">"department"</span>).<span class="fn">count</span>()    <span class="cm"># SHUFFLE</span>
 df.<span class="fn">orderBy</span>(<span class="str">"salary"</span>)                <span class="cm"># SHUFFLE</span>
@@ -507,7 +507,7 @@ df.write.<span class="fn">bucketBy</span>(<span class="num">32</span>, <span cla
   <!-- QUIZ 5.2 -->
   <div class="quiz-box" id="quiz52">
     <div class="quiz-header">
-      <div class="quiz-title">Quick Check — Shuffles</div>
+      <div class="quiz-title">Quick Check  -  Shuffles</div>
       <div class="quiz-progress" id="qp52">Question 1 of 4</div>
     </div>
     <div id="quiz52-body"></div>
@@ -536,7 +536,7 @@ df.write.<span class="fn">bucketBy</span>(<span class="num">32</span>, <span cla
     </div>
     <div class="card">
       <h4>MEMORY_AND_DISK_2</h4>
-      <p>Replicated across 2 nodes. Fault-tolerant — no recompute on executor failure.</p>
+      <p>Replicated across 2 nodes. Fault-tolerant  -  no recompute on executor failure.</p>
     </div>
   </div>
 
@@ -561,14 +561,14 @@ df.write.<span class="fn">bucketBy</span>(<span class="num">32</span>, <span cla
           <div class="timeline-step step-join" id="ts2-2" style="width:150px;">Join (2.1s)</div>
           <div class="timeline-step step-agg" id="ts2-3" style="width:80px;">Agg (0.9s)</div>
         </div>
-        <div class="timeline-total" id="tt2" style="color:#16a34a;display:none;">3.1s — 38% faster</div>
+        <div class="timeline-total" id="tt2" style="color:#16a34a;display:none;">3.1s  -  38% faster</div>
       </div>
     </div>
     <button class="anim-play-btn" onclick="playCacheAnim()">Play Animation</button>
   </div>
 
   <div class="code-wrap">
-    <div class="code-label"><span>Python — Caching Strategies</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <div class="code-label"><span>Python  -  Caching Strategies</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
     <pre class="code-block"><code><span class="kw">from</span> pyspark <span class="kw">import</span> StorageLevel
 
 <span class="cm"># cache() = shortcut for MEMORY_AND_DISK</span>
@@ -600,7 +600,7 @@ df_employees.<span class="fn">unpersist</span>()</code></pre>
   <!-- QUIZ 5.3 -->
   <div class="quiz-box" id="quiz53">
     <div class="quiz-header">
-      <div class="quiz-title">Quick Check — Caching</div>
+      <div class="quiz-title">Quick Check  -  Caching</div>
       <div class="quiz-progress" id="qp53">Question 1 of 4</div>
     </div>
     <div id="quiz53-body"></div>
@@ -612,7 +612,7 @@ df_employees.<span class="fn">unpersist</span>()</code></pre>
 <!-- ===== SECTION 5.4 CATALYST OPTIMIZER ===== -->
 <section class="section" id="s54">
   <div class="section-title"><span class="section-num">5.4</span> Catalyst Optimizer</div>
-  <p class="section-desc">Catalyst is Spark's automatic query optimizer. It transforms your logical plan into an efficient physical execution plan through 4 phases — without you doing anything.</p>
+  <p class="section-desc">Catalyst is Spark's automatic query optimizer. It transforms your logical plan into an efficient physical execution plan through 4 phases  -  without you doing anything.</p>
 
   <!-- CATALYST ANIMATION -->
   <div class="anim-container">
@@ -665,7 +665,7 @@ df_employees.<span class="fn">unpersist</span>()</code></pre>
   </div>
 
   <div class="code-wrap">
-    <div class="code-label"><span>Python — Inspect Execution Plans</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <div class="code-label"><span>Python  -  Inspect Execution Plans</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
     <pre class="code-block"><code><span class="cm"># See the execution plan</span>
 df.<span class="fn">filter</span>(<span class="fn">col</span>(<span class="str">"salary"</span>) > <span class="num">80000</span>).<span class="fn">select</span>(<span class="str">"name"</span>, <span class="str">"salary"</span>).<span class="fn">explain</span>()
 
@@ -688,7 +688,7 @@ df.<span class="fn">select</span>(<span class="str">"name"</span>, <span class="
   <!-- QUIZ 5.4 -->
   <div class="quiz-box" id="quiz54">
     <div class="quiz-header">
-      <div class="quiz-title">Quick Check — Catalyst Optimizer</div>
+      <div class="quiz-title">Quick Check  -  Catalyst Optimizer</div>
       <div class="quiz-progress" id="qp54">Question 1 of 4</div>
     </div>
     <div id="quiz54-body"></div>
@@ -700,7 +700,7 @@ df.<span class="fn">select</span>(<span class="str">"name"</span>, <span class="
 <!-- ===== SECTION 6.1 DELTA FUNDAMENTALS ===== -->
 <section class="section" id="s61">
   <div class="section-title"><span class="section-num">6.1</span> Delta Lake Fundamentals</div>
-  <p class="section-desc">Delta Lake adds ACID transactions, schema enforcement, and time travel to Parquet files on your data lake — no separate database engine required.</p>
+  <p class="section-desc">Delta Lake adds ACID transactions, schema enforcement, and time travel to Parquet files on your data lake  -  no separate database engine required.</p>
 
   <div class="info-box tip">
     <span class="info-icon">💡</span>
@@ -718,7 +718,7 @@ df.<span class="fn">select</span>(<span class="str">"name"</span>, <span class="
     </div>
     <div class="card">
       <h4>Isolation</h4>
-      <p>Concurrent writes use optimistic concurrency — don't corrupt each other.</p>
+      <p>Concurrent writes use optimistic concurrency  -  don't corrupt each other.</p>
     </div>
     <div class="card">
       <h4>Durability</h4>
@@ -773,7 +773,7 @@ df.<span class="fn">select</span>(<span class="str">"name"</span>, <span class="
   </div>
 
   <div class="code-wrap">
-    <div class="code-label"><span>Python — Delta Lake Basics</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <div class="code-label"><span>Python  -  Delta Lake Basics</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
     <pre class="code-block"><code><span class="cm"># Write as Delta</span>
 df.write.<span class="fn">format</span>(<span class="str">"delta"</span>).<span class="fn">mode</span>(<span class="str">"overwrite"</span>).<span class="fn">save</span>(<span class="str">"/delta/employees/"</span>)
 
@@ -807,7 +807,7 @@ new_df.write.<span class="fn">format</span>(<span class="str">"delta"</span>).<s
   <!-- QUIZ 6.1 -->
   <div class="quiz-box" id="quiz61">
     <div class="quiz-header">
-      <div class="quiz-title">Quick Check — Delta Fundamentals</div>
+      <div class="quiz-title">Quick Check  -  Delta Fundamentals</div>
       <div class="quiz-progress" id="qp61">Question 1 of 5</div>
     </div>
     <div id="quiz61-body"></div>
@@ -819,7 +819,7 @@ new_df.write.<span class="fn">format</span>(<span class="str">"delta"</span>).<s
 <!-- ===== SECTION 6.2 MERGE ===== -->
 <section class="section" id="s62">
   <div class="section-title"><span class="section-num">6.2</span> MERGE / Upsert</div>
-  <p class="section-desc">MERGE is the most important Delta operation. Update if a record exists, insert if it doesn't, delete if flagged — all atomically in one pass.</p>
+  <p class="section-desc">MERGE is the most important Delta operation. Update if a record exists, insert if it doesn't, delete if flagged  -  all atomically in one pass.</p>
 
   <div class="card-grid card-grid-4" style="margin-bottom:20px;">
     <div class="card">
@@ -870,7 +870,7 @@ new_df.write.<span class="fn">format</span>(<span class="str">"delta"</span>).<s
   </div>
 
   <div class="code-wrap">
-    <div class="code-label"><span>Python — MERGE (PySpark + SQL)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <div class="code-label"><span>Python  -  MERGE (PySpark + SQL)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
     <pre class="code-block"><code><span class="cm"># MERGE in PySpark (Delta)</span>
 <span class="kw">from</span> delta.tables <span class="kw">import</span> DeltaTable
 
@@ -913,7 +913,7 @@ spark.<span class="fn">sql</span>(<span class="str">"""
   <!-- QUIZ 6.2 -->
   <div class="quiz-box" id="quiz62">
     <div class="quiz-header">
-      <div class="quiz-title">Quick Check — MERGE / Upsert</div>
+      <div class="quiz-title">Quick Check  -  MERGE / Upsert</div>
       <div class="quiz-progress" id="qp62">Question 1 of 4</div>
     </div>
     <div id="quiz62-body"></div>
@@ -981,7 +981,7 @@ spark.<span class="fn">sql</span>(<span class="str">"""
   </div>
 
   <div class="code-wrap">
-    <div class="code-label"><span>Python — OPTIMIZE, Z-ORDER, VACUUM</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <div class="code-label"><span>Python  -  OPTIMIZE, Z-ORDER, VACUUM</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
     <pre class="code-block"><code><span class="cm"># OPTIMIZE: compacts small files into larger ones</span>
 spark.<span class="fn">sql</span>(<span class="str">"OPTIMIZE delta.`/delta/employees/`"</span>)
 
@@ -1011,7 +1011,7 @@ spark.<span class="fn">sql</span>(<span class="str">"""
   <!-- QUIZ 6.3 -->
   <div class="quiz-box" id="quiz63">
     <div class="quiz-header">
-      <div class="quiz-title">Quick Check — Delta Optimization</div>
+      <div class="quiz-title">Quick Check  -  Delta Optimization</div>
       <div class="quiz-progress" id="qp63">Question 1 of 4</div>
     </div>
     <div id="quiz63-body"></div>
@@ -1023,7 +1023,7 @@ spark.<span class="fn">sql</span>(<span class="str">"""
 <!-- ===== INTERVIEW QUESTIONS ===== -->
 <section class="section" id="sIQ">
   <div class="section-title">Interview Questions</div>
-  <p class="section-desc">12 real interview questions covering Spark optimization and Delta Lake — from entry-level to senior engineer difficulty.</p>
+  <p class="section-desc">12 real interview questions covering Spark optimization and Delta Lake  -  from entry-level to senior engineer difficulty.</p>
 
   <div id="iqList">
 
@@ -1032,7 +1032,7 @@ spark.<span class="fn">sql</span>(<span class="str">"""
         <div class="iq-q">What is the difference between repartition() and coalesce()?</div>
         <div class="iq-badges"><span class="badge badge-easy">Easy</span><span class="iq-toggle">▼</span></div>
       </div>
-      <div class="iq-body"><strong>repartition(n)</strong> performs a full shuffle and can increase or decrease partition count with even distribution. <strong>coalesce(n)</strong> avoids shuffle by merging partitions on the same executor — only decreases count and may be uneven. Use <strong>coalesce</strong> when reducing partitions (e.g., before write), use <strong>repartition</strong> when increasing or when you need even distribution for joins.</div>
+      <div class="iq-body"><strong>repartition(n)</strong> performs a full shuffle and can increase or decrease partition count with even distribution. <strong>coalesce(n)</strong> avoids shuffle by merging partitions on the same executor  -  only decreases count and may be uneven. Use <strong>coalesce</strong> when reducing partitions (e.g., before write), use <strong>repartition</strong> when increasing or when you need even distribution for joins.</div>
     </div>
 
     <div class="iq-item" onclick="toggleIQ(this)">
@@ -1040,7 +1040,7 @@ spark.<span class="fn">sql</span>(<span class="str">"""
         <div class="iq-q">What operations cause shuffles in Spark?</div>
         <div class="iq-badges"><span class="badge badge-easy">Easy</span><span class="iq-toggle">▼</span></div>
       </div>
-      <div class="iq-body"><strong>groupBy, orderBy, distinct, join (non-broadcast), repartition.</strong> Shuffles move data across the network between executors — the most expensive operation in Spark because it involves serialization, network transfer, and deserialization. filter, select, withColumn, and coalesce do NOT cause shuffles.</div>
+      <div class="iq-body"><strong>groupBy, orderBy, distinct, join (non-broadcast), repartition.</strong> Shuffles move data across the network between executors  -  the most expensive operation in Spark because it involves serialization, network transfer, and deserialization. filter, select, withColumn, and coalesce do NOT cause shuffles.</div>
     </div>
 
     <div class="iq-item" onclick="toggleIQ(this)">
@@ -1056,7 +1056,7 @@ spark.<span class="fn">sql</span>(<span class="str">"""
         <div class="iq-q">Explain Catalyst Optimizer's 4 phases.</div>
         <div class="iq-badges"><span class="badge badge-medium">Medium</span><span class="iq-toggle">▼</span></div>
       </div>
-      <div class="iq-body">1) <strong>Analysis</strong> — resolves column names, validates schema, checks types. 2) <strong>Logical Optimization</strong> — applies rule-based optimizations: predicate pushdown, column pruning, constant folding. 3) <strong>Physical Planning</strong> — generates multiple physical plans, chooses the best based on cost model (e.g., decides broadcast vs. sort-merge join). 4) <strong>Code Generation</strong> — Tungsten engine generates optimized JVM bytecode, operates on binary data to minimize serialization overhead.</div>
+      <div class="iq-body">1) <strong>Analysis</strong>  -  resolves column names, validates schema, checks types. 2) <strong>Logical Optimization</strong>  -  applies rule-based optimizations: predicate pushdown, column pruning, constant folding. 3) <strong>Physical Planning</strong>  -  generates multiple physical plans, chooses the best based on cost model (e.g., decides broadcast vs. sort-merge join). 4) <strong>Code Generation</strong>  -  Tungsten engine generates optimized JVM bytecode, operates on binary data to minimize serialization overhead.</div>
     </div>
 
     <div class="iq-item" onclick="toggleIQ(this)">
@@ -1064,7 +1064,7 @@ spark.<span class="fn">sql</span>(<span class="str">"""
         <div class="iq-q">What are Delta Lake's ACID properties?</div>
         <div class="iq-badges"><span class="badge badge-medium">Medium</span><span class="iq-toggle">▼</span></div>
       </div>
-      <div class="iq-body"><strong>Atomicity</strong> — writes fully succeed or fail, no partial writes that corrupt the table. <strong>Consistency</strong> — schema enforced on every write, constraints respected, table always in valid state. <strong>Isolation</strong> — concurrent writers use optimistic concurrency control via the transaction log, don't corrupt each other. <strong>Durability</strong> — committed data persists through failures because the transaction log is stored on durable object storage.</div>
+      <div class="iq-body"><strong>Atomicity</strong>  -  writes fully succeed or fail, no partial writes that corrupt the table. <strong>Consistency</strong>  -  schema enforced on every write, constraints respected, table always in valid state. <strong>Isolation</strong>  -  concurrent writers use optimistic concurrency control via the transaction log, don't corrupt each other. <strong>Durability</strong>  -  committed data persists through failures because the transaction log is stored on durable object storage.</div>
     </div>
 
     <div class="iq-item" onclick="toggleIQ(this)">
@@ -1096,7 +1096,7 @@ spark.<span class="fn">sql</span>(<span class="str">"""
         <div class="iq-q">Explain Z-ORDER and when to use it.</div>
         <div class="iq-badges"><span class="badge badge-hard">Hard</span><span class="iq-toggle">▼</span></div>
       </div>
-      <div class="iq-body"><strong>Z-ORDER</strong> co-locates related data within Parquet files using a space-filling curve algorithm. When you filter on Z-ORDERed columns, Delta's data-skipping statistics let it skip entire files that don't match. Best for <strong>high-cardinality columns</strong> frequently used in WHERE clauses (department, date, customer_id). Run as: <code>OPTIMIZE table ZORDER BY (col1, col2)</code>. Not beneficial for low-cardinality columns (e.g., boolean, status with 3 values) — partitioning is better for those.</div>
+      <div class="iq-body"><strong>Z-ORDER</strong> co-locates related data within Parquet files using a space-filling curve algorithm. When you filter on Z-ORDERed columns, Delta's data-skipping statistics let it skip entire files that don't match. Best for <strong>high-cardinality columns</strong> frequently used in WHERE clauses (department, date, customer_id). Run as: <code>OPTIMIZE table ZORDER BY (col1, col2)</code>. Not beneficial for low-cardinality columns (e.g., boolean, status with 3 values)  -  partitioning is better for those.</div>
     </div>
 
     <div class="iq-item" onclick="toggleIQ(this)">
@@ -1104,7 +1104,7 @@ spark.<span class="fn">sql</span>(<span class="str">"""
         <div class="iq-q">What causes the small files problem and how do you fix it?</div>
         <div class="iq-badges"><span class="badge badge-medium">Medium</span><span class="iq-toggle">▼</span></div>
       </div>
-      <div class="iq-body"><strong>Cause:</strong> Frequent small appends (streaming micro-batches, hourly CDC loads) each create new small Parquet files. After 1000 loads, a simple scan reads 1000 files — each requiring separate I/O + metadata overhead. <strong>Fix:</strong> Run OPTIMIZE regularly (daily or post-load), enable <code>delta.autoOptimize.autoCompact = true</code> in Databricks, use coalesce before writes, batch small writes into larger ones, or enable <code>delta.autoOptimize.optimizeWrite</code> for automatic bin-packing.</div>
+      <div class="iq-body"><strong>Cause:</strong> Frequent small appends (streaming micro-batches, hourly CDC loads) each create new small Parquet files. After 1000 loads, a simple scan reads 1000 files  -  each requiring separate I/O + metadata overhead. <strong>Fix:</strong> Run OPTIMIZE regularly (daily or post-load), enable <code>delta.autoOptimize.autoCompact = true</code> in Databricks, use coalesce before writes, batch small writes into larger ones, or enable <code>delta.autoOptimize.optimizeWrite</code> for automatic bin-packing.</div>
     </div>
 
     <div class="iq-item" onclick="toggleIQ(this)">
@@ -1120,7 +1120,7 @@ spark.<span class="fn">sql</span>(<span class="str">"""
         <div class="iq-q">How do you choose a partitioning strategy for a large Delta table?</div>
         <div class="iq-badges"><span class="badge badge-hard">Hard</span><span class="iq-toggle">▼</span></div>
       </div>
-      <div class="iq-body">Partition by <strong>low-cardinality, frequently filtered columns</strong> (date, region, department). Avoid high-cardinality columns (id, timestamp) — creates too many small partition directories. Target 1GB+ per partition directory for efficient reads. Use <strong>Z-ORDER within partitions</strong> for secondary filter columns (e.g., partition by date, Z-ORDER by customer_id for fast customer lookups within a date range). For time-series data: partition by year/month, not full date if data is sparse per day.</div>
+      <div class="iq-body">Partition by <strong>low-cardinality, frequently filtered columns</strong> (date, region, department). Avoid high-cardinality columns (id, timestamp)  -  creates too many small partition directories. Target 1GB+ per partition directory for efficient reads. Use <strong>Z-ORDER within partitions</strong> for secondary filter columns (e.g., partition by date, Z-ORDER by customer_id for fast customer lookups within a date range). For time-series data: partition by year/month, not full date if data is sparse per day.</div>
     </div>
 
   </div>
@@ -1422,7 +1422,7 @@ const quizData = {
   q51: {
     title: 'Partitions', progress: 'qp51', body: 'quiz51-body',
     questions: [
-      { q: 'What is the default value of spark.sql.shuffle.partitions?', opts: ['50','200','100','500'], correct: 1, exp: 'The default shuffle partition count is 200. This is often too high for small datasets — reduce it for better performance on smaller jobs.' },
+      { q: 'What is the default value of spark.sql.shuffle.partitions?', opts: ['50','200','100','500'], correct: 1, exp: 'The default shuffle partition count is 200. This is often too high for small datasets  -  reduce it for better performance on smaller jobs.' },
       { q: 'Which operation performs a full shuffle?', opts: ['coalesce','repartition','filter','select'], correct: 1, exp: 'repartition() always performs a full shuffle across the network to ensure even distribution. coalesce merges locally without a shuffle.' },
       { q: 'What is the optimal partition size?', opts: ['10 MB','64 MB','128 MB','512 MB'], correct: 2, exp: '128 MB is the widely recommended target partition size. Smaller = too much overhead; larger = risk of OOM errors.' },
       { q: 'When should you use coalesce instead of repartition?', opts: ['To increase partitions','When you need even distribution','To decrease partitions without shuffle','After a join'], correct: 2, exp: 'coalesce is the right choice when reducing partition count (e.g., before writing output) because it avoids the costly network shuffle.' }
@@ -1431,9 +1431,9 @@ const quizData = {
   q52: {
     title: 'Shuffles', progress: 'qp52', body: 'quiz52-body',
     questions: [
-      { q: 'Which operation does NOT cause a shuffle?', opts: ['groupBy','filter','orderBy','distinct'], correct: 1, exp: 'filter is a narrow transformation — data stays on the same executor, no network movement needed. All others require data redistribution.' },
+      { q: 'Which operation does NOT cause a shuffle?', opts: ['groupBy','filter','orderBy','distinct'], correct: 1, exp: 'filter is a narrow transformation  -  data stays on the same executor, no network movement needed. All others require data redistribution.' },
       { q: 'What is the default broadcast join threshold?', opts: ['5 MB','10 MB','50 MB','100 MB'], correct: 1, exp: 'The default autoBroadcastJoinThreshold is 10 MB. Tables smaller than this are automatically broadcast to all executors.' },
-      { q: 'What makes shuffles expensive?', opts: ['CPU usage','Network data transfer','Memory allocation','File I/O'], correct: 1, exp: 'Shuffles require serializing data, sending it across the network to different executors, and deserializing it — network transfer is the primary cost.' },
+      { q: 'What makes shuffles expensive?', opts: ['CPU usage','Network data transfer','Memory allocation','File I/O'], correct: 1, exp: 'Shuffles require serializing data, sending it across the network to different executors, and deserializing it  -  network transfer is the primary cost.' },
       { q: 'Bucketing helps by:', opts: ['Compressing data','Pre-sorting within partitions','Avoiding shuffle for repeated joins on same key','Reducing file count'], correct: 2, exp: 'Bucketing pre-partitions data on disk by the join key. When the same bucketed table is joined repeatedly, Spark can skip the shuffle entirely.' }
     ]
   },
@@ -1443,7 +1443,7 @@ const quizData = {
       { q: 'What does cache() use as default storage level?', opts: ['MEMORY_ONLY','MEMORY_AND_DISK','DISK_ONLY','MEMORY_AND_DISK_2'], correct: 1, exp: 'cache() is a shortcut for persist(StorageLevel.MEMORY_AND_DISK). It stores in memory first, spills to disk if needed.' },
       { q: 'When is caching NOT beneficial?', opts: ['Multiple reuses','Large DataFrames with loops','Single use DataFrames','After expensive joins'], correct: 2, exp: 'If a DataFrame is only used once, the overhead of caching (extra computation + memory pressure) outweighs any benefit. Cache only when reusing.' },
       { q: 'Which storage level is fault tolerant?', opts: ['MEMORY_ONLY','DISK_ONLY','MEMORY_AND_DISK','MEMORY_AND_DISK_2'], correct: 3, exp: 'MEMORY_AND_DISK_2 replicates cached data across 2 nodes. If one executor fails, the data is available from the replica without recomputation.' },
-      { q: 'What triggers actual caching?', opts: ['cache() call','persist() call','First action after cache()','DataFrame creation'], correct: 2, exp: 'Spark is lazy — cache() and persist() just mark the DataFrame. The actual caching happens when the first action (count, show, etc.) is executed.' }
+      { q: 'What triggers actual caching?', opts: ['cache() call','persist() call','First action after cache()','DataFrame creation'], correct: 2, exp: 'Spark is lazy  -  cache() and persist() just mark the DataFrame. The actual caching happens when the first action (count, show, etc.) is executed.' }
     ]
   },
   q54: {
@@ -1469,7 +1469,7 @@ const quizData = {
     title: 'MERGE / Upsert', progress: 'qp62', body: 'quiz62-body',
     questions: [
       { q: 'MERGE combines which operations?', opts: ['Read and Write','Insert, Update, and Delete','Filter and Join','Cache and Persist'], correct: 1, exp: 'MERGE atomically handles Insert (new records), Update (existing records), and Delete (flagged records) in a single pass over the target table.' },
-      { q: 'whenNotMatchedInsert handles:', opts: ['Existing records','Deleted records','New records not in target','Schema mismatches'], correct: 2, exp: 'whenNotMatchedInsert fires when a source record has no matching row in the target table — it inserts the record as a new row.' },
+      { q: 'whenNotMatchedInsert handles:', opts: ['Existing records','Deleted records','New records not in target','Schema mismatches'], correct: 2, exp: 'whenNotMatchedInsert fires when a source record has no matching row in the target table  -  it inserts the record as a new row.' },
       { q: 'MERGE is essential for:', opts: ['Schema evolution','Time travel','Incremental/CDC loads','File compaction'], correct: 2, exp: 'MERGE is the core operation for incremental data processing: CDC (Change Data Capture), SCD Type 1 updates, and daily fact table refreshes that need to update existing rows.' },
       { q: 'The merge condition:', opts: ['Filters source data','Matches source to target rows','Defines insert columns','Sets update values'], correct: 1, exp: 'The merge condition (e.g., "target.id = source.id") is the JOIN predicate that determines which source rows match existing target rows.' }
     ]
@@ -1505,7 +1505,7 @@ function renderQuestion(key) {
     progEl.textContent = 'Complete!';
     bodyEl.innerHTML = `<div class="quiz-score" style="display:block;">
       <div class="score-val">${state.score}/${total}</div>
-      <p>${state.score === total ? 'Perfect score! Excellent work.' : state.score >= total*0.75 ? 'Great job! Almost there.' : 'Keep practicing — review the sections above.'}</p>
+      <p>${state.score === total ? 'Perfect score! Excellent work.' : state.score >= total*0.75 ? 'Great job! Almost there.' : 'Keep practicing  -  review the sections above.'}</p>
       <button class="quiz-retry-btn" onclick="retryQuiz('${key}')">Try Again</button>
     </div>`;
     return;

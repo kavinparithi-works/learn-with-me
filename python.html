@@ -277,7 +277,7 @@ section[id]{scroll-margin-top:80px}
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
-  <div class="sidebar-title">Level 2 — Python for PySpark</div>
+  <div class="sidebar-title">Level 2  -  Python for PySpark</div>
   <ul class="sidebar-nav">
     <li><a href="#section-21" onclick="scrollTo('section-21')"><span class="nav-num">1</span>Variables &amp; Data Types</a></li>
     <li><a href="#section-22" onclick="scrollTo('section-22')"><span class="nav-num">2</span>Conditions (if/elif/else)</a></li>
@@ -306,14 +306,14 @@ section[id]{scroll-margin-top:80px}
       <span class="module-num">MODULE 2.1</span>
       <h2>Variables and Data Types</h2>
     </div>
-    <p>A <strong>variable</strong> is a labeled box in memory that stores a value. Python is dynamically typed — you don't declare types, Python figures them out at runtime.</p>
+    <p>A <strong>variable</strong> is a labeled box in memory that stores a value. Python is dynamically typed  -  you don't declare types, Python figures them out at runtime.</p>
     <p>The five core types you'll use constantly in data engineering:</p>
     <div class="type-grid">
       <div class="type-card purple"><div class="type-name">str</div><div class="type-desc">Text: "Alice", "engineer", "2024-01-01"</div></div>
       <div class="type-card blue"><div class="type-name">int</div><div class="type-desc">Whole numbers: 30, 0, -5, 1_000_000</div></div>
       <div class="type-card green"><div class="type-name">float</div><div class="type-desc">Decimals: 95000.50, 3.14, -0.001</div></div>
-      <div class="type-card orange"><div class="type-name">bool</div><div class="type-desc">True or False — nothing else</div></div>
-      <div class="type-card gray" style="grid-column:span 2"><div class="type-name">None</div><div class="type-desc">The absence of a value — Python's equivalent of NULL in SQL</div></div>
+      <div class="type-card orange"><div class="type-name">bool</div><div class="type-desc">True or False  -  nothing else</div></div>
+      <div class="type-card gray" style="grid-column:span 2"><div class="type-name">None</div><div class="type-desc">The absence of a value  -  Python's equivalent of NULL in SQL</div></div>
     </div>
 
     <!-- MEMORY ANIMATION -->
@@ -340,7 +340,7 @@ section[id]{scroll-margin-top:80px}
       </div>
     </div>
 
-    <div class="code-block"><span class="cmt"># Variable assignment — Python infers the type</span>
+    <div class="code-block"><span class="cmt"># Variable assignment  -  Python infers the type</span>
 name = <span class="str">"Alice"</span>              <span class="cmt"># str</span>
 age = <span class="num">30</span>                   <span class="cmt"># int</span>
 salary = <span class="num">95000.50</span>          <span class="cmt"># float</span>
@@ -355,7 +355,7 @@ age_str = <span class="fn">str</span>(age)           <span class="cmt"># "30"</s
 salary_int = <span class="fn">int</span>(salary)    <span class="cmt"># 95000  (truncates!)</span>
 flag = <span class="fn">bool</span>(<span class="num">1</span>)              <span class="cmt"># True</span>
 
-<span class="cmt"># f-strings — the modern way to format strings</span>
+<span class="cmt"># f-strings  -  the modern way to format strings</span>
 msg = <span class="str">f"Employee <span class="op">{</span>name<span class="op">}</span> earns $<span class="op">{</span>salary:,.2f<span class="op">}</span>"</span>
 <span class="builtin">print</span>(msg)  <span class="cmt"># Employee Alice earns $95,000.50</span></div>
 
@@ -374,7 +374,7 @@ schema = StructType([
 
     <!-- QUIZ 2.1 -->
     <div class="quiz">
-      <h3>🧠 Quick Check — Variables &amp; Types</h3>
+      <h3>🧠 Quick Check  -  Variables &amp; Types</h3>
       <div class="quiz-q" data-correct="2">
         <div class="q-text">1. What is the type of: <code>x = 42</code>?</div>
         <div class="quiz-options">
@@ -432,11 +432,11 @@ schema = StructType([
       <span class="module-num">MODULE 2.2</span>
       <h2>Conditions (if/elif/else)</h2>
     </div>
-    <p>Conditions let your code make decisions. Python uses <strong>if</strong>, <strong>elif</strong> (else-if), and <strong>else</strong>. Indentation (4 spaces) defines the block — no curly braces needed.</p>
+    <p>Conditions let your code make decisions. Python uses <strong>if</strong>, <strong>elif</strong> (else-if), and <strong>else</strong>. Indentation (4 spaces) defines the block  -  no curly braces needed.</p>
     <div class="type-grid">
-      <div class="type-card purple"><div class="type-name">Comparison operators</div><div class="type-desc">== != &gt; &lt; &gt;= &lt;= — compare two values, return bool</div></div>
-      <div class="type-card blue"><div class="type-name">Logical operators</div><div class="type-desc">and, or, not — combine conditions</div></div>
-      <div class="type-card green"><div class="type-name">Membership</div><div class="type-desc">in, not in — check if value is in a collection</div></div>
+      <div class="type-card purple"><div class="type-name">Comparison operators</div><div class="type-desc">== != &gt; &lt; &gt;= &lt;=  -  compare two values, return bool</div></div>
+      <div class="type-card blue"><div class="type-name">Logical operators</div><div class="type-desc">and, or, not  -  combine conditions</div></div>
+      <div class="type-card green"><div class="type-name">Membership</div><div class="type-desc">in, not in  -  check if value is in a collection</div></div>
       <div class="type-card orange"><div class="type-name">Ternary (inline)</div><div class="type-desc">value_if_true if condition else value_if_false</div></div>
     </div>
 
@@ -504,7 +504,7 @@ label = <span class="str">"Senior"</span> <span class="kw">if</span> salary > <s
 
     <div class="pyspark-box">
       <h4>⚡ PySpark Relevance</h4>
-      <p>Python <code>if/elif/else</code> translates to PySpark's <code>when()</code> and <code>otherwise()</code> — the equivalent of SQL CASE WHEN:</p>
+      <p>Python <code>if/elif/else</code> translates to PySpark's <code>when()</code> and <code>otherwise()</code>  -  the equivalent of SQL CASE WHEN:</p>
       <div class="code-block"><span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> F
 
 df = df.withColumn(<span class="str">"role"</span>,
@@ -515,7 +515,7 @@ df = df.withColumn(<span class="str">"role"</span>,
     </div>
 
     <div class="quiz">
-      <h3>🧠 Quick Check — Conditions</h3>
+      <h3>🧠 Quick Check  -  Conditions</h3>
       <div class="quiz-q" data-correct="1">
         <div class="q-text">1. What keyword handles additional conditions after <code>if</code>?</div>
         <div class="quiz-options">
@@ -583,25 +583,25 @@ salaries = [<span class="num">50000</span>, <span class="num">75000</span>, <spa
 <span class="kw">for</span> salary <span class="kw">in</span> salaries:
     <span class="builtin">print</span>(salary)
 
-<span class="cmt"># range() — generates a sequence of numbers</span>
+<span class="cmt"># range()  -  generates a sequence of numbers</span>
 <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>):      <span class="cmt"># 0, 1, 2, 3, 4</span>
     <span class="builtin">print</span>(i)
 
-<span class="cmt"># enumerate() — index + value together</span>
+<span class="cmt"># enumerate()  -  index + value together</span>
 <span class="kw">for</span> i, name <span class="kw">in</span> <span class="fn">enumerate</span>([<span class="str">"Alice"</span>, <span class="str">"Bob"</span>, <span class="str">"Carol"</span>]):
     <span class="builtin">print</span>(<span class="str">f"<span class="op">{</span>i<span class="op">}</span>: <span class="op">{</span>name<span class="op">}</span>"</span>)
 
-<span class="cmt"># zip() — iterate two lists in parallel</span>
+<span class="cmt"># zip()  -  iterate two lists in parallel</span>
 names = [<span class="str">"Alice"</span>, <span class="str">"Bob"</span>]
 sals  = [<span class="num">95000</span>, <span class="num">80000</span>]
 <span class="kw">for</span> name, sal <span class="kw">in</span> <span class="fn">zip</span>(names, sals):
     <span class="builtin">print</span>(<span class="str">f"<span class="op">{</span>name<span class="op">}</span> earns <span class="op">{</span>sal<span class="op">}</span>"</span>)
 
-<span class="cmt"># List comprehension — concise way to build a list</span>
+<span class="cmt"># List comprehension  -  concise way to build a list</span>
 squared = [x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>)]          <span class="cmt"># [0, 1, 4, 9, 16]</span>
 high_sal = [s <span class="kw">for</span> s <span class="kw">in</span> salaries <span class="kw">if</span> s > <span class="num">70000</span>] <span class="cmt"># [75000, 90000]</span>
 
-<span class="cmt"># while loop — runs until condition is False</span>
+<span class="cmt"># while loop  -  runs until condition is False</span>
 count = <span class="num">0</span>
 <span class="kw">while</span> count < <span class="num">3</span>:
     <span class="builtin">print</span>(<span class="str">f"attempt <span class="op">{</span>count<span class="op">}</span>"</span>)
@@ -615,7 +615,7 @@ count = <span class="num">0</span>
 
     <div class="pyspark-box">
       <h4>⚡ PySpark Relevance</h4>
-      <p>Loops in Python are used to <em>build</em> PySpark pipelines dynamically — you rarely loop over rows (PySpark handles that in parallel). Common pattern: loop to create multiple columns or aggregate multiple fields.</p>
+      <p>Loops in Python are used to <em>build</em> PySpark pipelines dynamically  -  you rarely loop over rows (PySpark handles that in parallel). Common pattern: loop to create multiple columns or aggregate multiple fields.</p>
       <div class="code-block"><span class="cmt"># Loop to add multiple transformed columns</span>
 cols_to_upper = [<span class="str">"first_name"</span>, <span class="str">"last_name"</span>, <span class="str">"department"</span>]
 <span class="kw">for</span> col_name <span class="kw">in</span> cols_to_upper:
@@ -627,7 +627,7 @@ df.select(numeric_cols).show()</div>
     </div>
 
     <div class="quiz">
-      <h3>🧠 Quick Check — Loops</h3>
+      <h3>🧠 Quick Check  -  Loops</h3>
       <div class="quiz-q" data-correct="1">
         <div class="q-text">1. What does <code>range(3)</code> produce?</div>
         <div class="quiz-options">
@@ -660,7 +660,7 @@ df.select(numeric_cols).show()</div>
         <div class="quiz-options">
           <div class="quiz-opt" data-idx="0">Python doesn't support it</div>
           <div class="quiz-opt" data-idx="1">PySpark uses SQL only</div>
-          <div class="quiz-opt" data-idx="2">PySpark processes rows in parallel on the cluster — Python loops are sequential and slow</div>
+          <div class="quiz-opt" data-idx="2">PySpark processes rows in parallel on the cluster  -  Python loops are sequential and slow</div>
           <div class="quiz-opt" data-idx="3">Loops don't work with DataFrames</div>
         </div>
       </div>
@@ -706,19 +706,19 @@ df.select(numeric_cols).show()</div>
 <span class="builtin">print</span>(get_bonus(<span class="num">95000</span>))           <span class="cmt"># 9500.0 (uses default rate)</span>
 <span class="builtin">print</span>(get_bonus(<span class="num">95000</span>, <span class="num">0.15</span>))   <span class="cmt"># 14250.0</span>
 
-<span class="cmt"># *args — accepts any number of positional arguments</span>
+<span class="cmt"># *args  -  accepts any number of positional arguments</span>
 <span class="kw">def</span> <span class="fn">sum_salaries</span>(*args):
     <span class="kw">return</span> <span class="fn">sum</span>(args)
 
 <span class="builtin">print</span>(sum_salaries(<span class="num">50000</span>, <span class="num">75000</span>, <span class="num">90000</span>))  <span class="cmt"># 215000</span>
 
-<span class="cmt"># **kwargs — accepts any number of keyword arguments</span>
+<span class="cmt"># **kwargs  -  accepts any number of keyword arguments</span>
 <span class="kw">def</span> <span class="fn">create_employee</span>(**kwargs):
     <span class="kw">return</span> kwargs
 
 emp = create_employee(name=<span class="str">"Bob"</span>, dept=<span class="str">"Data"</span>, salary=<span class="num">80000</span>)
 
-<span class="cmt"># lambda — anonymous one-liner function</span>
+<span class="cmt"># lambda  -  anonymous one-liner function</span>
 double = <span class="kw">lambda</span> x: x * <span class="num">2</span>
 classify = <span class="kw">lambda</span> s: <span class="str">"Senior"</span> <span class="kw">if</span> s > <span class="num">80000</span> <span class="kw">else</span> <span class="str">"Standard"</span>
 
@@ -730,7 +730,7 @@ lo, hi, avg = stats([<span class="num">50000</span>, <span class="num">75000</sp
 
     <div class="pyspark-box">
       <h4>⚡ PySpark UDFs (User Defined Functions)</h4>
-      <p>Python functions become PySpark UDFs — custom transformations applied to every row of a DataFrame. Use sparingly; built-in PySpark functions are faster.</p>
+      <p>Python functions become PySpark UDFs  -  custom transformations applied to every row of a DataFrame. Use sparingly; built-in PySpark functions are faster.</p>
       <div class="code-block"><span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> udf
 <span class="kw">from</span> pyspark.sql.types <span class="kw">import</span> StringType
 
@@ -748,7 +748,7 @@ df = df.withColumn(<span class="str">"band"</span>, classify_udf(F.col(<span cla
     </div>
 
     <div class="quiz">
-      <h3>🧠 Quick Check — Functions</h3>
+      <h3>🧠 Quick Check  -  Functions</h3>
       <div class="quiz-q" data-correct="2">
         <div class="q-text">1. What does <code>*args</code> collect in a function?</div>
         <div class="quiz-options">
@@ -838,24 +838,24 @@ df = df.withColumn(<span class="str">"band"</span>, classify_udf(F.col(<span cla
       </div>
     </div>
 
-    <div class="code-block"><span class="cmt"># LIST — ordered, mutable, allows duplicates</span>
+    <div class="code-block"><span class="cmt"># LIST  -  ordered, mutable, allows duplicates</span>
 cols = [<span class="str">"name"</span>, <span class="str">"age"</span>, <span class="str">"salary"</span>]
 cols.append(<span class="str">"department"</span>)    <span class="cmt"># add to end</span>
 cols.remove(<span class="str">"age"</span>)           <span class="cmt"># remove by value</span>
 first = cols[<span class="num">0</span>]              <span class="cmt"># index access → "name"</span>
 sub = cols[<span class="num">1</span>:<span class="num">3</span>]             <span class="cmt"># slicing</span>
 
-<span class="cmt"># TUPLE — ordered, immutable (can't change after creation)</span>
+<span class="cmt"># TUPLE  -  ordered, immutable (can't change after creation)</span>
 row = (<span class="str">"Alice"</span>, <span class="num">30</span>, <span class="num">95000.0</span>)
 name, age, salary = row       <span class="cmt"># tuple unpacking</span>
 
-<span class="cmt"># SET — unordered, unique values, O(1) membership test</span>
+<span class="cmt"># SET  -  unordered, unique values, O(1) membership test</span>
 seen_ids = {<span class="num">101</span>, <span class="num">102</span>, <span class="num">103</span>}
 seen_ids.add(<span class="num">104</span>)
 <span class="kw">if</span> <span class="num">101</span> <span class="kw">in</span> seen_ids:          <span class="cmt"># extremely fast</span>
     <span class="builtin">print</span>(<span class="str">"duplicate!"</span>)
 
-<span class="cmt"># DICT — key-value store, mutable, ordered (Python 3.7+)</span>
+<span class="cmt"># DICT  -  key-value store, mutable, ordered (Python 3.7+)</span>
 emp = {<span class="str">"name"</span>: <span class="str">"Alice"</span>, <span class="str">"dept"</span>: <span class="str">"Data"</span>, <span class="str">"salary"</span>: <span class="num">95000</span>}
 emp[<span class="str">"bonus"</span>] = <span class="num">9500</span>         <span class="cmt"># add/update key</span>
 dept = emp.get(<span class="str">"dept"</span>, <span class="str">"Unknown"</span>)  <span class="cmt"># safe access</span>
@@ -886,7 +886,7 @@ dupes = {x <span class="kw">for</span> x <span class="kw">in</span> ids <span cl
     </div>
 
     <div class="quiz">
-      <h3>🧠 Quick Check — Collections</h3>
+      <h3>🧠 Quick Check  -  Collections</h3>
       <div class="quiz-q" data-correct="1">
         <div class="q-text">1. Which collection type does NOT allow duplicate values?</div>
         <div class="quiz-options">
@@ -902,7 +902,7 @@ dupes = {x <span class="kw">for</span> x <span class="kw">in</span> ids <span cl
           <div class="quiz-opt" data-idx="0">Tuples support more methods</div>
           <div class="quiz-opt" data-idx="1">Tuples allow duplicates</div>
           <div class="quiz-opt" data-idx="2">Tuples are slower</div>
-          <div class="quiz-opt" data-idx="3">Tuples are immutable — safer for fixed records like DB rows</div>
+          <div class="quiz-opt" data-idx="3">Tuples are immutable  -  safer for fixed records like DB rows</div>
         </div>
       </div>
       <div class="quiz-q" data-correct="2">
@@ -935,7 +935,7 @@ dupes = {x <span class="kw">for</span> x <span class="kw">in</span> ids <span cl
       <span class="module-num">MODULE 2.6</span>
       <h2>Object-Oriented Python</h2>
     </div>
-    <p>OOP organizes code around <strong>objects</strong> — bundles of data (attributes) and behavior (methods). A <strong>class</strong> is the blueprint; an <strong>instance</strong> is a concrete object created from it. PySpark itself is heavily OOP — SparkSession, DataFrame, Column are all classes.</p>
+    <p>OOP organizes code around <strong>objects</strong>  -  bundles of data (attributes) and behavior (methods). A <strong>class</strong> is the blueprint; an <strong>instance</strong> is a concrete object created from it. PySpark itself is heavily OOP  -  SparkSession, DataFrame, Column are all classes.</p>
 
     <!-- OOP ANIMATION -->
     <div class="oop-anim">
@@ -975,7 +975,7 @@ dupes = {x <span class="kw">for</span> x <span class="kw">in</span> ids <span cl
     <span class="cmt"># Class variable (shared by all instances)</span>
     company = <span class="str">"TechCorp"</span>
 
-    <span class="cmt"># __init__ is the constructor — runs when object is created</span>
+    <span class="cmt"># __init__ is the constructor  -  runs when object is created</span>
     <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, name, salary, dept):
         <span class="kw">self</span>.name = name        <span class="cmt"># instance variable</span>
         <span class="kw">self</span>.salary = salary
@@ -1001,7 +1001,7 @@ bob   = <span class="cls">Employee</span>(<span class="str">"Bob"</span>,   <spa
 <span class="builtin">print</span>(alice.get_band())     <span class="cmt"># Senior</span>
 alice.apply_raise(<span class="num">0.15</span>)    <span class="cmt"># 109250.0</span>
 
-<span class="cmt"># Inheritance — extend a class</span>
+<span class="cmt"># Inheritance  -  extend a class</span>
 <span class="kw">class</span> <span class="cls">Manager</span>(<span class="cls">Employee</span>):
     <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, name, salary, dept, reports):
         <span class="fn">super</span>().__init__(name, salary, dept)  <span class="cmt"># call parent __init__</span>
@@ -1038,12 +1038,12 @@ carol = <span class="cls">Manager</span>(<span class="str">"Carol"</span>, <span
     </div>
 
     <div class="quiz">
-      <h3>🧠 Quick Check — OOP</h3>
+      <h3>🧠 Quick Check  -  OOP</h3>
       <div class="quiz-q" data-correct="1">
         <div class="q-text">1. What is <code>__init__</code> in a Python class?</div>
         <div class="quiz-options">
           <div class="quiz-opt" data-idx="0">A static method</div>
-          <div class="quiz-opt" data-idx="1">The constructor — called when an object is created</div>
+          <div class="quiz-opt" data-idx="1">The constructor  -  called when an object is created</div>
           <div class="quiz-opt" data-idx="2">A destructor</div>
           <div class="quiz-opt" data-idx="3">A class variable</div>
         </div>
@@ -1106,9 +1106,9 @@ carol = <span class="cls">Manager</span>(<span class="str">"Carol"</span>, <span
           <div class="acc-answer">
             <strong>List</strong> is <em>mutable</em> (can be changed after creation) and uses square brackets <code>[]</code>. <strong>Tuple</strong> is <em>immutable</em> (cannot be changed) and uses parentheses <code>()</code>.<br/><br/>
             <strong>When to use which:</strong><br/>
-            • Use a <strong>list</strong> when the collection may change — adding columns, filtering rows, building dynamic SELECT lists.<br/>
-            • Use a <strong>tuple</strong> when data is fixed — a row record, a coordinate pair, or a function returning multiple values.<br/><br/>
-            <strong>Key difference in PySpark:</strong> DataFrame <code>.dtypes</code> returns a list of tuples like <code>[('name', 'string'), ('age', 'int')]</code> — the outer list is mutable, each inner tuple is an immutable record.
+            • Use a <strong>list</strong> when the collection may change  -  adding columns, filtering rows, building dynamic SELECT lists.<br/>
+            • Use a <strong>tuple</strong> when data is fixed  -  a row record, a coordinate pair, or a function returning multiple values.<br/><br/>
+            <strong>Key difference in PySpark:</strong> DataFrame <code>.dtypes</code> returns a list of tuples like <code>[('name', 'string'), ('age', 'int')]</code>  -  the outer list is mutable, each inner tuple is an immutable record.
           </div>
         </div>
       </div>
@@ -1126,7 +1126,7 @@ carol = <span class="cls">Manager</span>(<span class="str">"Carol"</span>, <span
         </div>
         <div class="accordion-body">
           <div class="acc-answer">
-            <strong>Immutable types</strong>: int, float, str, bool, tuple, frozenset. Their value cannot change after creation — Python creates a new object when you "modify" them.<br/><br/>
+            <strong>Immutable types</strong>: int, float, str, bool, tuple, frozenset. Their value cannot change after creation  -  Python creates a new object when you "modify" them.<br/><br/>
             <strong>Mutable types</strong>: list, dict, set, most objects. They can be modified in-place.<br/><br/>
             <strong>The gotcha</strong>: When you pass a mutable type to a function, the function can modify the original:<br/>
             <div class="acc-code">def add_column(cols, new_col):
@@ -1180,12 +1180,12 @@ log_event("start", "transform", table="employees", rows=5000)
         </div>
         <div class="accordion-body">
           <div class="acc-answer">
-            <strong>List comprehension</strong> <code>[expr for x in iterable]</code> — evaluates eagerly, stores all values in memory immediately.<br/><br/>
-            <strong>Generator expression</strong> <code>(expr for x in iterable)</code> — evaluates lazily, yields one value at a time. Uses much less memory for large datasets.<br/>
-            <div class="acc-code"># List comprehension — all values in memory at once
+            <strong>List comprehension</strong> <code>[expr for x in iterable]</code>  -  evaluates eagerly, stores all values in memory immediately.<br/><br/>
+            <strong>Generator expression</strong> <code>(expr for x in iterable)</code>  -  evaluates lazily, yields one value at a time. Uses much less memory for large datasets.<br/>
+            <div class="acc-code"># List comprehension  -  all values in memory at once
 squares = [x**2 for x in range(1_000_000)]  # 8MB in memory
 
-# Generator — compute one at a time
+# Generator  -  compute one at a time
 squares_gen = (x**2 for x in range(1_000_000))  # ~120 bytes!
 for sq in squares_gen:
     process(sq)  # only one value in memory at a time</div>
@@ -1208,7 +1208,7 @@ for sq in squares_gen:
         <div class="accordion-body">
           <div class="acc-answer">
             A <strong>lambda</strong> is an anonymous (unnamed) function defined in a single expression. Syntax: <code>lambda args: expression</code>.<br/><br/>
-            Use it for short, throwaway functions — typically as arguments to <code>sorted()</code>, <code>map()</code>, <code>filter()</code>, or similar higher-order functions:
+            Use it for short, throwaway functions  -  typically as arguments to <code>sorted()</code>, <code>map()</code>, <code>filter()</code>, or similar higher-order functions:
             <div class="acc-code"># Sort employees by salary descending
 employees = [{"name": "Alice", "salary": 95000}, {"name": "Bob", "salary": 80000}]
 sorted_emps = sorted(employees, key=lambda e: e["salary"], reverse=True)
@@ -1219,7 +1219,7 @@ after_raise = list(map(lambda s: s * 1.1, salaries))
 
 # filter() to filter a list
 high_sal = list(filter(lambda s: s > 70000, salaries))</div>
-            <strong>Avoid</strong> using lambda for complex logic — use a named <code>def</code> function instead for readability.
+            <strong>Avoid</strong> using lambda for complex logic  -  use a named <code>def</code> function instead for readability.
           </div>
         </div>
       </div>
@@ -1237,8 +1237,8 @@ high_sal = list(filter(lambda s: s > 70000, salaries))</div>
         </div>
         <div class="accordion-body">
           <div class="acc-answer">
-            Python uses <strong>reference counting</strong> as its primary memory management strategy. Every object has a reference count — the number of variables pointing to it. When the count reaches zero, the memory is freed immediately.<br/><br/>
-            <strong>Garbage collector (gc module)</strong>: Handles reference cycles (object A points to B, B points back to A — reference counts never reach zero). Python's cyclic garbage collector runs periodically to detect and free these cycles.<br/>
+            Python uses <strong>reference counting</strong> as its primary memory management strategy. Every object has a reference count  -  the number of variables pointing to it. When the count reaches zero, the memory is freed immediately.<br/><br/>
+            <strong>Garbage collector (gc module)</strong>: Handles reference cycles (object A points to B, B points back to A  -  reference counts never reach zero). Python's cyclic garbage collector runs periodically to detect and free these cycles.<br/>
             <div class="acc-code">import sys, gc
 
 x = [1, 2, 3]
@@ -1250,7 +1250,7 @@ del x          # reference count → 1 (then 0 → freed)
 
 # Force garbage collection (rarely needed)
 gc.collect()</div>
-            <strong>In data engineering</strong>: Python memory management matters less when using PySpark — data lives on the JVM/cluster. But be careful with <code>.collect()</code> which pulls all data to the Python driver.
+            <strong>In data engineering</strong>: Python memory management matters less when using PySpark  -  data lives on the JVM/cluster. But be careful with <code>.collect()</code> which pulls all data to the Python driver.
           </div>
         </div>
       </div>
@@ -1280,8 +1280,8 @@ deep    = copy.deepcopy(original)
 # Modify nested item
 original[0][1] = 99999
 
-print(shallow[0][1])  # 99999 — shallow copy IS affected!
-print(deep[0][1])     # 95000 — deep copy is NOT affected</div>
+print(shallow[0][1])  # 99999  -  shallow copy IS affected!
+print(deep[0][1])     # 95000  -  deep copy is NOT affected</div>
             In pipeline code, use deep copy when you need to branch transformations from the same base state without interference.
           </div>
         </div>
@@ -1301,7 +1301,7 @@ print(deep[0][1])     # 95000 — deep copy is NOT affected</div>
         <div class="accordion-body">
           <div class="acc-answer">
             Use a <strong>set</strong> when:<br/>
-            • You need to check membership fast — <code>O(1)</code> vs list's <code>O(n)</code><br/>
+            • You need to check membership fast  -  <code>O(1)</code> vs list's <code>O(n)</code><br/>
             • You want to eliminate duplicates automatically<br/>
             • You need set operations: union, intersection, difference<br/><br/>
             Use a <strong>list</strong> when:<br/>
@@ -1312,7 +1312,7 @@ print(deep[0][1])     # 95000 — deep copy is NOT affected</div>
 raw_ids = [101, 102, 101, 103, 102, 104]
 unique_ids = list(set(raw_ids))  # [101, 102, 103, 104]
 
-# Membership check — set is much faster for large data
+# Membership check  -  set is much faster for large data
 valid_depts = {"Engineering", "Data", "Analytics", "Operations"}
 if emp_dept in valid_depts:   # O(1) hash lookup
     process(employee)</div>
@@ -1333,7 +1333,7 @@ if emp_dept in valid_depts:   # O(1) hash lookup
         </div>
         <div class="accordion-body">
           <div class="acc-answer">
-            A <strong>decorator</strong> is a function that wraps another function to add behavior before/after it runs — without modifying the original function's code. Uses the <code>@</code> syntax.<br/>
+            A <strong>decorator</strong> is a function that wraps another function to add behavior before/after it runs  -  without modifying the original function's code. Uses the <code>@</code> syntax.<br/>
             <div class="acc-code">import time, functools
 
 # Define a decorator
@@ -1389,7 +1389,7 @@ def read_source(spark, path, table_name):
         raise   # re-raise so the pipeline fails loud
 
     finally:
-        # Always runs — good for cleanup, closing connections
+        # Always runs  -  good for cleanup, closing connections
         logger.info(f"Finished read attempt for {table_name}")
 
 # Specific exception types
@@ -1402,7 +1402,7 @@ except ZeroDivisionError:
 except Exception as e:
     print(f"Unexpected: {e}")
     raise</div>
-            <strong>Best practice</strong>: Catch specific exceptions rather than bare <code>except:</code>. Always re-raise unexpected errors in production pipelines — silent failures are worse than loud ones.
+            <strong>Best practice</strong>: Catch specific exceptions rather than bare <code>except:</code>. Always re-raise unexpected errors in production pipelines  -  silent failures are worse than loud ones.
           </div>
         </div>
       </div>
